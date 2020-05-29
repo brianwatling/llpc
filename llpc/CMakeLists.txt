@@ -74,6 +74,7 @@ if(ICD_BUILD_LLPC)
         set(XGL_LLVM_SRC_PATH ${PROJECT_SOURCE_DIR}/../../../imported/llvm-project/llvm CACHE PATH "Specify the path to the LLVM.")
     endif()
 
+    set(XGL_LLVM_SRC_PATH /usr/local/google/home/bwatling/git/vulkandriver/drivers/llvm-project/llvm)
     add_subdirectory(${XGL_LLVM_SRC_PATH} ${PROJECT_BINARY_DIR}/llvm)
     set(XGL_LLVM_BUILD_PATH ${PROJECT_BINARY_DIR}/llvm)
 
@@ -232,6 +233,7 @@ target_include_directories(llpc
         ${PROJECT_SOURCE_DIR}/include
         ${PROJECT_SOURCE_DIR}/lower
         ${PROJECT_SOURCE_DIR}/translator/include
+        ${PROJECT_SOURCE_DIR}/translator/lib
         ${PROJECT_SOURCE_DIR}/translator/lib/SPIRV
         ${PROJECT_SOURCE_DIR}/translator/lib/SPIRV/libSPIRV
         ${PROJECT_SOURCE_DIR}/util
@@ -291,6 +293,7 @@ if(ICD_BUILD_LLPC)
         translator/lib/SPIRV/libSPIRV/SPIRVInstruction.cpp
         translator/lib/SPIRV/libSPIRV/SPIRVModule.cpp
         translator/lib/SPIRV/libSPIRV/SPIRVStream.cpp
+        translator/lib/SPIRV/libSPIRV/SPIRVToLLVMDbgTran.cpp
         translator/lib/SPIRV/libSPIRV/SPIRVType.cpp
         translator/lib/SPIRV/libSPIRV/SPIRVValue.cpp
     )
@@ -416,7 +419,7 @@ if(ICD_BUILD_LLPC)
 if(EXISTS ${PROJECT_SOURCE_DIR}/../../spvgen)
     set(XGL_SPVGEN_PATH ${PROJECT_SOURCE_DIR}/../../spvgen CACHE PATH "Specify the path to SPVGEN.")
 else()
-    set(XGL_SPVGEN_PATH ${PROJECT_SOURCE_DIR}/../../../../tools/spvgen CACHE PATH "Specify the path to SPVGEN.")
+    set(XGL_SPVGEN_PATH /usr/local/google/home/bwatling/git/vulkandriver/drivers/spvgen CACHE PATH "Specify the path to SPVGEN.")
 endif()
 
 if(EXISTS ${XGL_SPVGEN_PATH})

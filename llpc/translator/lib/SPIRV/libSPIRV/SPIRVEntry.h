@@ -1,4 +1,5 @@
-//===- SPIRVEntry.h - Base Class for SPIR-V Entities -------------*- C++ -*-===//
+//===- SPIRVEntry.h - Base Class for SPIR-V Entities -------------*- C++
+//-*-===//
 //
 //                     The LLVM/SPIRV Translator
 //
@@ -40,9 +41,6 @@
 #ifndef SPIRV_LIBSPIRV_SPIRVENTRY_H
 #define SPIRV_LIBSPIRV_SPIRVENTRY_H
 
-#include "SPIRVEnum.h"
-#include "SPIRVError.h"
-#include "SPIRVIsValidEnum.h"
 #include <cassert>
 #include <iostream>
 #include <map>
@@ -52,6 +50,10 @@
 #include <type_traits>
 #include <unordered_map>
 #include <vector>
+
+#include "SPIRVEnum.h"
+#include "SPIRVError.h"
+#include "SPIRVIsValidEnum.h"
 
 namespace SPIRV {
 
@@ -69,82 +71,81 @@ class SPIRVExtInst;
 
 // Add declaration of decode functions to a class.
 // Used inside class definition.
-#define _SPIRV_DCL_DECODE                                                      \
-  void decode(std::istream &I) override;
+#define _SPIRV_DCL_DECODE void decode(std::istream &I) override;
 
-#define _REQ_SPIRV_VER(Version)                                                \
+#define _REQ_SPIRV_VER(Version) \
   SPIRVWord getRequiredSPIRVVersion() const override { return Version; }
 
 // Add implementation of decode functions to a class.
 // Used out side of class definition.
-#define _SPIRV_IMP_DECODE0(Ty)                                                 \
+#define _SPIRV_IMP_DECODE0(Ty) \
   void Ty::decode(std::istream &I) {}
-#define _SPIRV_IMP_DECODE1(Ty, x)                                              \
+#define _SPIRV_IMP_DECODE1(Ty, x) \
   void Ty::decode(std::istream &I) { getDecoder(I) >> (x); }
-#define _SPIRV_IMP_ENCDEC2(Ty, x, y)                                           \
+#define _SPIRV_IMP_ENCDEC2(Ty, x, y) \
   void Ty::decode(std::istream &I) { getDecoder(I) >> (x) >> (y); }
-#define _SPIRV_IMP_DECODE3(Ty, x, y, z)                                        \
+#define _SPIRV_IMP_DECODE3(Ty, x, y, z) \
   void Ty::decode(std::istream &I) { getDecoder(I) >> (x) >> (y) >> (z); }
-#define _SPIRV_IMP_DECODE4(Ty, x, y, z, u)                                     \
-  void Ty::decode(std::istream &I) {                                           \
-    getDecoder(I) >> (x) >> (y) >> (z) >> (u);                                 \
+#define _SPIRV_IMP_DECODE4(Ty, x, y, z, u)     \
+  void Ty::decode(std::istream &I) {           \
+    getDecoder(I) >> (x) >> (y) >> (z) >> (u); \
   }
-#define _SPIRV_IMP_DECODE5(Ty, x, y, z, u, v)                                  \
-  void Ty::decode(std::istream &I) {                                           \
-    getDecoder(I) >> (x) >> (y) >> (z) >> (u) >> (v);                          \
+#define _SPIRV_IMP_DECODE5(Ty, x, y, z, u, v)         \
+  void Ty::decode(std::istream &I) {                  \
+    getDecoder(I) >> (x) >> (y) >> (z) >> (u) >> (v); \
   }
-#define _SPIRV_IMP_DECODE6(Ty, x, y, z, u, v, w)                               \
-  void Ty::decode(std::istream &I) {                                           \
-    getDecoder(I) >> (x) >> (y) >> (z) >> (u) >> (v) >> (w);                   \
+#define _SPIRV_IMP_DECODE6(Ty, x, y, z, u, v, w)             \
+  void Ty::decode(std::istream &I) {                         \
+    getDecoder(I) >> (x) >> (y) >> (z) >> (u) >> (v) >> (w); \
   }
-#define _SPIRV_IMP_DECODE7(Ty, x, y, z, u, v, w, r)                            \
-  void Ty::decode(std::istream &I) {                                           \
-    getDecoder(I) >> (x) >> (y) >> (z) >> (u) >> (v) >> (w) >> (r);            \
+#define _SPIRV_IMP_DECODE7(Ty, x, y, z, u, v, w, r)                 \
+  void Ty::decode(std::istream &I) {                                \
+    getDecoder(I) >> (x) >> (y) >> (z) >> (u) >> (v) >> (w) >> (r); \
   }
-#define _SPIRV_IMP_DECODE8(Ty, x, y, z, u, v, w, r, s)                         \
-  void Ty::decode(std::istream &I) {                                           \
-    getDecoder(I) >> (x) >> (y) >> (z) >> (u) >> (v) >> (w) >> (r) >> (s);     \
+#define _SPIRV_IMP_DECODE8(Ty, x, y, z, u, v, w, r, s)                     \
+  void Ty::decode(std::istream &I) {                                       \
+    getDecoder(I) >> (x) >> (y) >> (z) >> (u) >> (v) >> (w) >> (r) >> (s); \
   }
-#define _SPIRV_IMP_DECODE9(Ty, x, y, z, u, v, w, r, s, t)                      \
-  void Ty::decode(std::istream &I) {                                           \
-    getDecoder(I) >> (x) >> (y) >> (z) >> (u) >> (v) >> (w) >> (r) >> (s) >>   \
-        (t);                                                                   \
+#define _SPIRV_IMP_DECODE9(Ty, x, y, z, u, v, w, r, s, t)                    \
+  void Ty::decode(std::istream &I) {                                         \
+    getDecoder(I) >> (x) >> (y) >> (z) >> (u) >> (v) >> (w) >> (r) >> (s) >> \
+        (t);                                                                 \
   }
 
 // Add definition of encode/decode functions to a class.
 // Used inside class definition.
-#define _SPIRV_DEF_DECODE0                                                     \
+#define _SPIRV_DEF_DECODE0 \
   void decode(std::istream &I) override {}
-#define _SPIRV_DEF_DECODE1(x)                                                  \
+#define _SPIRV_DEF_DECODE1(x) \
   void decode(std::istream &I) override { getDecoder(I) >> (x); }
-#define _SPIRV_DEF_DECODE2(x, y)                                               \
+#define _SPIRV_DEF_DECODE2(x, y) \
   void decode(std::istream &I) override { getDecoder(I) >> (x) >> (y); }
-#define _SPIRV_DEF_DECODE3(x, y, z)                                            \
+#define _SPIRV_DEF_DECODE3(x, y, z) \
   void decode(std::istream &I) override { getDecoder(I) >> (x) >> (y) >> (z); }
-#define _SPIRV_DEF_DECODE4(x, y, z, u)                                         \
-  void decode(std::istream &I) override {                                      \
-    getDecoder(I) >> (x) >> (y) >> (z) >> (u);                                 \
+#define _SPIRV_DEF_DECODE4(x, y, z, u)         \
+  void decode(std::istream &I) override {      \
+    getDecoder(I) >> (x) >> (y) >> (z) >> (u); \
   }
-#define _SPIRV_DEF_DECODE5(x, y, z, u, v)                                      \
-  void decode(std::istream &I) override {                                      \
-    getDecoder(I) >> (x) >> (y) >> (z) >> (u) >> (v);                          \
+#define _SPIRV_DEF_DECODE5(x, y, z, u, v)             \
+  void decode(std::istream &I) override {             \
+    getDecoder(I) >> (x) >> (y) >> (z) >> (u) >> (v); \
   }
-#define _SPIRV_DEF_DECODE6(x, y, z, u, v, w)                                   \
-  void decode(std::istream &I) override {                                      \
-    getDecoder(I) >> (x) >> (y) >> (z) >> (u) >> (v) >> (w);                   \
+#define _SPIRV_DEF_DECODE6(x, y, z, u, v, w)                 \
+  void decode(std::istream &I) override {                    \
+    getDecoder(I) >> (x) >> (y) >> (z) >> (u) >> (v) >> (w); \
   }
-#define _SPIRV_DEF_DECODE7(x, y, z, u, v, w, r)                                \
-  void decode(std::istream &I) override {                                      \
-    getDecoder(I) >> (x) >> (y) >> (z) >> (u) >> (v) >> (w) >> (r);            \
+#define _SPIRV_DEF_DECODE7(x, y, z, u, v, w, r)                     \
+  void decode(std::istream &I) override {                           \
+    getDecoder(I) >> (x) >> (y) >> (z) >> (u) >> (v) >> (w) >> (r); \
   }
-#define _SPIRV_DEF_DECODE8(x, y, z, u, v, w, r, s)                             \
-  void decode(std::istream &I) override {                                      \
-    getDecoder(I) >> (x) >> (y) >> (z) >> (u) >> (v) >> (w) >> (r) >> (s);     \
+#define _SPIRV_DEF_DECODE8(x, y, z, u, v, w, r, s)                         \
+  void decode(std::istream &I) override {                                  \
+    getDecoder(I) >> (x) >> (y) >> (z) >> (u) >> (v) >> (w) >> (r) >> (s); \
   }
-#define _SPIRV_DEF_DECODE9(x, y, z, u, v, w, r, s, t)                          \
-  void decode(std::istream &I) override {                                      \
-    getDecoder(I) >> (x) >> (y) >> (z) >> (u) >> (v) >> (w) >> (r) >> (s) >>   \
-        (t);                                                                   \
+#define _SPIRV_DEF_DECODE9(x, y, z, u, v, w, r, s, t)                        \
+  void decode(std::istream &I) override {                                    \
+    getDecoder(I) >> (x) >> (y) >> (z) >> (u) >> (v) >> (w) >> (r) >> (s) >> \
+        (t);                                                                 \
   }
 
 /// All SPIR-V in-memory-representation entities inherits from SPIRVEntry.
@@ -183,40 +184,57 @@ class SPIRVExtInst;
 /// 8. Add the class to SPIRVToLLVM.
 
 class SPIRVEntry {
-public:
+ public:
   enum SPIRVEntryAttrib {
     SPIRVEA_DEFAULT = 0,
-    SPIRVEA_NOID = 1,   // Entry has no valid id
-    SPIRVEA_NOTYPE = 2, // Value has no type
+    SPIRVEA_NOID = 1,    // Entry has no valid id
+    SPIRVEA_NOTYPE = 2,  // Value has no type
   };
 
   // Complete constructor for objects with id
   SPIRVEntry(SPIRVModule *M, unsigned TheWordCount, Op TheOpCode, SPIRVId TheId)
-      : Module(M), OpCode(TheOpCode), Id(TheId), Attrib(SPIRVEA_DEFAULT),
-        WordCount(TheWordCount), Line(nullptr) {
+      : Module(M),
+        OpCode(TheOpCode),
+        Id(TheId),
+        Attrib(SPIRVEA_DEFAULT),
+        WordCount(TheWordCount),
+        Line(nullptr) {
     validate();
   }
 
   // Complete constructor for objects without id
   SPIRVEntry(SPIRVModule *M, unsigned TheWordCount, Op TheOpCode)
-      : Module(M), OpCode(TheOpCode), Id(SPIRVID_INVALID), Attrib(SPIRVEA_NOID),
-        WordCount(TheWordCount), Line(nullptr) {
+      : Module(M),
+        OpCode(TheOpCode),
+        Id(SPIRVID_INVALID),
+        Attrib(SPIRVEA_NOID),
+        WordCount(TheWordCount),
+        Line(nullptr) {
     validate();
   }
 
   // Incomplete constructor
   SPIRVEntry(Op TheOpCode)
-      : Module(NULL), OpCode(TheOpCode), Id(SPIRVID_INVALID),
-        Attrib(SPIRVEA_DEFAULT), WordCount(0), Line(nullptr) {}
+      : Module(NULL),
+        OpCode(TheOpCode),
+        Id(SPIRVID_INVALID),
+        Attrib(SPIRVEA_DEFAULT),
+        WordCount(0),
+        Line(nullptr) {}
 
   SPIRVEntry()
-      : Module(NULL), OpCode(OpNop), Id(SPIRVID_INVALID),
-        Attrib(SPIRVEA_DEFAULT), WordCount(0), Line(nullptr) {}
+      : Module(NULL),
+        OpCode(OpNop),
+        Id(SPIRVID_INVALID),
+        Attrib(SPIRVEA_DEFAULT),
+        WordCount(0),
+        Line(nullptr) {}
 
   virtual ~SPIRVEntry() {}
 
   bool exist(SPIRVId) const;
-  template <class T> T *get(SPIRVId TheId) const {
+  template <class T>
+  T *get(SPIRVId TheId) const {
     return static_cast<T *>(getEntry(TheId));
   }
   SPIRVEntry *getEntry(SPIRVId) const;
@@ -249,6 +267,9 @@ public:
   bool hasLinkageType() const;
   bool isAtomic() const { return isAtomicOpCode(OpCode); }
   bool isBasicBlock() const { return isLabel(); }
+  bool isExtInst() const { return OpCode == OpExtInst; }
+  bool isExtInst(const SPIRVExtInstSetKind InstSet,
+                 const SPIRVWord ExtOp) const;
   bool isBuiltinCall() const { return OpCode == OpExtInst; }
   bool isDecorate() const { return OpCode == OpDecorate; }
   bool isMemberDecorate() const { return OpCode == OpMemberDecorate; }
@@ -321,7 +342,7 @@ public:
     return std::vector<SPIRVEntry *>();
   }
 
-protected:
+ protected:
   /// An entry may have multiple FuncParamAttr decorations.
   typedef std::multimap<Decoration, const SPIRVDecorate *> DecorateMapType;
 
@@ -329,7 +350,7 @@ protected:
     using DecorationInt = std::underlying_type<Decoration>::type;
     std::hash<SPIRVWord> wordHash;
     std::hash<DecorationInt> decorationHash;
-    size_t operator()(const std::pair<SPIRVWord, Decoration>& key) const {
+    size_t operator()(const std::pair<SPIRVWord, Decoration> &key) const {
       return wordHash(key.first) ^
              decorationHash(static_cast<DecorationInt>(key.second));
     }
@@ -361,19 +382,20 @@ protected:
 };
 
 class SPIRVEntryNoIdGeneric : public SPIRVEntry {
-public:
+ public:
   SPIRVEntryNoIdGeneric(SPIRVModule *M, unsigned TheWordCount, Op OC)
       : SPIRVEntry(M, TheWordCount, OC) {
     setAttr();
   }
   SPIRVEntryNoIdGeneric(Op OC) : SPIRVEntry(OC) { setAttr(); }
 
-protected:
+ protected:
   void setAttr() { setHasNoId(); }
 };
 
-template <Op OC> class SPIRVEntryNoId : public SPIRVEntryNoIdGeneric {
-public:
+template <Op OC>
+class SPIRVEntryNoId : public SPIRVEntryNoIdGeneric {
+ public:
   SPIRVEntryNoId(SPIRVModule *M, unsigned TheWordCount)
       : SPIRVEntryNoIdGeneric(M, TheWordCount, OC) {}
   SPIRVEntryNoId() : SPIRVEntryNoIdGeneric(OC) {}
@@ -381,19 +403,19 @@ public:
 
 template <Op TheOpCode>
 class SPIRVEntryOpCodeOnly : public SPIRVEntryNoId<TheOpCode> {
-public:
+ public:
   SPIRVEntryOpCodeOnly() {
     SPIRVEntry::WordCount = 1;
     validate();
   }
 
-protected:
+ protected:
   _SPIRV_DEF_DECODE0
   void validate() const override { assert(isValidId(SPIRVEntry::OpCode)); }
 };
 
 class SPIRVAnnotationGeneric : public SPIRVEntryNoIdGeneric {
-public:
+ public:
   // Complete constructor
   SPIRVAnnotationGeneric(SPIRVModule *TheModule, unsigned TheWordCount, Op OC,
                          SPIRVId TheTarget = SPIRVID_INVALID)
@@ -406,12 +428,13 @@ public:
   SPIRVForward *getOrCreateTarget() const;
   void setTargetId(SPIRVId T) { Target = T; }
 
-protected:
+ protected:
   SPIRVId Target;
 };
 
-template <Op OC> class SPIRVAnnotation : public SPIRVAnnotationGeneric {
-public:
+template <Op OC>
+class SPIRVAnnotation : public SPIRVAnnotationGeneric {
+ public:
   // Complete constructor
   SPIRVAnnotation(const SPIRVEntry *TheTarget, unsigned TheWordCount)
       : SPIRVAnnotationGeneric(TheTarget->getModule(), TheWordCount, OC,
@@ -421,30 +444,30 @@ public:
 };
 
 class SPIRVEntryPoint : public SPIRVAnnotation<OpEntryPoint> {
-public:
+ public:
   SPIRVEntryPoint(SPIRVModule *TheModule, SPIRVExecutionModelKind,
                   SPIRVId TheId, const std::string &TheName);
   SPIRVEntryPoint() : ExecModel(ExecutionModelVertex) {}
-  SPIRVExecutionModelKind getExecModel()const { return ExecModel; }
+  SPIRVExecutionModelKind getExecModel() const { return ExecModel; }
   std::string getName() const { return Name; }
   std::pair<const SPIRVWord *, size_t> getInOuts() const {
-    return { InOuts.data(), InOuts.size() };
+    return {InOuts.data(), InOuts.size()};
   }
   _SPIRV_DCL_DECODE
-protected:
+ protected:
   SPIRVExecutionModelKind ExecModel;
   std::string Name;
   std::vector<SPIRVWord> InOuts;
 };
 
 class SPIRVName : public SPIRVAnnotation<OpName> {
-public:
+ public:
   // Complete constructor
   SPIRVName(const SPIRVEntry *TheTarget, const std::string &TheStr);
   // Incomplete constructor
   SPIRVName() {}
 
-protected:
+ protected:
   _SPIRV_DCL_DECODE
   void validate() const override;
 
@@ -452,19 +475,20 @@ protected:
 };
 
 class SPIRVMemberName : public SPIRVAnnotation<OpName> {
-public:
+ public:
   static const SPIRVWord FixedWC = 3;
   // Complete constructor
   SPIRVMemberName(const SPIRVEntry *TheTarget, SPIRVWord TheMemberNumber,
                   const std::string &TheStr)
       : SPIRVAnnotation(TheTarget, FixedWC + getSizeInWords(TheStr)),
-        MemberNumber(TheMemberNumber), Str(TheStr) {
+        MemberNumber(TheMemberNumber),
+        Str(TheStr) {
     validate();
   }
   // Incomplete constructor
   SPIRVMemberName() : MemberNumber(SPIRVWORD_MAX) {}
 
-protected:
+ protected:
   _SPIRV_DCL_DECODE
   void validate() const override;
   SPIRVWord MemberNumber;
@@ -475,7 +499,7 @@ class SPIRVString : public SPIRVEntry {
   static const Op OC = OpString;
   static const SPIRVWord FixedWC = 2;
 
-public:
+ public:
   SPIRVString(SPIRVModule *M, SPIRVId TheId, const std::string &TheStr)
       : SPIRVEntry(M, FixedWC + getSizeInWords(TheStr), OC, TheId),
         Str(TheStr) {}
@@ -483,23 +507,27 @@ public:
   _SPIRV_DCL_DECODE
   const std::string &getStr() const { return Str; }
 
-protected:
+ protected:
   std::string Str;
 };
 
-class SPIRVLine:public SPIRVEntryNoId<OpLine> {
-public:
+class SPIRVLine : public SPIRVEntryNoId<OpLine> {
+ public:
   // Complete constructor
   SPIRVLine(SPIRVModule *M, SPIRVId TheFileName, SPIRVWord TheLine,
             SPIRVWord TheColumn)
-    : SPIRVEntryNoId(M, 4), FileName(TheFileName), Line(TheLine),
-      Column(TheColumn) {
+      : SPIRVEntryNoId(M, 4),
+        FileName(TheFileName),
+        Line(TheLine),
+        Column(TheColumn) {
     Attrib = SPIRVEA_NOID | SPIRVEA_NOTYPE;
     validate();
   }
   // Incomplete constructor
   SPIRVLine()
-      : SPIRVEntryNoId(), FileName(SPIRVID_INVALID), Line(SPIRVWORD_MAX),
+      : SPIRVEntryNoId(),
+        FileName(SPIRVID_INVALID),
+        Line(SPIRVWORD_MAX),
         Column(SPIRVWORD_MAX) {
     Attrib = SPIRVEA_NOID | SPIRVEA_NOTYPE;
   }
@@ -529,7 +557,7 @@ public:
     return FileName == TheFileName && Line == TheLine && Column == TheColumn;
   }
 
-protected:
+ protected:
   _SPIRV_DCL_DECODE
   void validate() const override;
   SPIRVId FileName;
@@ -540,7 +568,7 @@ protected:
 typedef SPIRVEntryOpCodeOnly<OpNoLine> SPIRVNoLine;
 
 class SPIRVExecutionMode : public SPIRVAnnotation<OpExecutionMode> {
-public:
+ public:
   // Complete constructor for LocalSize
   SPIRVExecutionMode(SPIRVEntry *TheTarget, SPIRVExecutionModeKind TheExecMode,
                      SPIRVWord X, SPIRVWord Y, SPIRVWord Z)
@@ -568,25 +596,24 @@ public:
 
   SPIRVWord getRequiredSPIRVVersion() const override {
     switch (ExecMode) {
-    case ExecutionModeSubgroupSize:
-    case ExecutionModeSubgroupsPerWorkgroup:
-      return SPIRV_1_1;
+      case ExecutionModeSubgroupSize:
+      case ExecutionModeSubgroupsPerWorkgroup:
+        return SPIRV_1_1;
 
-    default:
-      return SPIRV_1_0;
+      default:
+        return SPIRV_1_0;
     }
   }
 
-  void mergeExecutionMode(SPIRVExecutionMode *EM)
-  {
+  void mergeExecutionMode(SPIRVExecutionMode *EM) {
     assert(WordLiterals.size() == 1);
     assert(ExecMode == EM->ExecMode);
-    assert(EM->WordLiterals[0] == 16 ||
-           EM->WordLiterals[0] == 32 ||
+    assert(EM->WordLiterals[0] == 16 || EM->WordLiterals[0] == 32 ||
            EM->WordLiterals[0] == 64);
     WordLiterals[0] |= EM->WordLiterals[0];
   }
-protected:
+
+ protected:
   _SPIRV_DCL_DECODE
   SPIRVExecutionModeKind ExecMode;
   std::vector<SPIRVWord> WordLiterals;
@@ -596,7 +623,7 @@ class SPIRVComponentExecutionModes {
   typedef std::map<SPIRVExecutionModeKind, SPIRVExecutionMode *>
       SPIRVExecutionModeMap;
 
-public:
+ public:
   void addExecutionMode(SPIRVExecutionMode *ExecMode) {
     ExecModes[ExecMode->getExecutionMode()] = ExecMode;
   }
@@ -612,17 +639,16 @@ public:
 
   SPIRVExecutionMode *getExecutionMode(SPIRVExecutionModeKind EMK) const {
     auto Loc = ExecModes.find(EMK);
-    if (Loc == ExecModes.end())
-      return nullptr;
+    if (Loc == ExecModes.end()) return nullptr;
     return Loc->second;
   }
 
-protected:
+ protected:
   SPIRVExecutionModeMap ExecModes;
 };
 
 class SPIRVExtInstImport : public SPIRVEntry {
-public:
+ public:
   const static Op OC = OpExtInstImport;
   // Complete constructor
   SPIRVExtInstImport(SPIRVModule *TheModule, SPIRVId TheId,
@@ -630,7 +656,7 @@ public:
   // Incomplete constructor
   SPIRVExtInstImport() : SPIRVEntry(OC) {}
 
-protected:
+ protected:
   _SPIRV_DCL_DECODE
   void validate() const override;
 
@@ -638,7 +664,7 @@ protected:
 };
 
 class SPIRVMemoryModel : public SPIRVEntryNoId<OpMemoryModel> {
-public:
+ public:
   SPIRVMemoryModel(SPIRVModule *M) : SPIRVEntryNoId(M, 3) {}
   SPIRVMemoryModel() {}
   _SPIRV_DCL_DECODE
@@ -646,80 +672,80 @@ public:
 };
 
 class SPIRVSource : public SPIRVEntryNoId<OpSource> {
-public:
+ public:
   SPIRVSource(SPIRVModule *M) : SPIRVEntryNoId(M, 3) {}
   SPIRVSource() {}
   _SPIRV_DCL_DECODE
-private:
+ private:
   SPIRVId File;
   std::string Source;
 };
 
 class SPIRVSourceContinued : public SPIRVEntryNoId<OpSourceContinued> {
-public:
+ public:
   SPIRVSourceContinued(SPIRVModule *M, const std::string &SS);
   SPIRVSourceContinued() {}
   _SPIRV_DCL_DECODE
-private:
+ private:
   std::string Str;
 };
 
 class SPIRVSourceExtension : public SPIRVEntryNoId<OpSourceExtension> {
-public:
+ public:
   SPIRVSourceExtension(SPIRVModule *M, const std::string &SS);
   SPIRVSourceExtension() {}
   _SPIRV_DCL_DECODE
-private:
+ private:
   std::string S;
 };
 
 class SPIRVExtension : public SPIRVEntryNoId<OpExtension> {
-public:
+ public:
   SPIRVExtension(SPIRVModule *M, const std::string &SS);
   SPIRVExtension() {}
   _SPIRV_DCL_DECODE
-private:
+ private:
   std::string S;
 };
 
 class SPIRVCapability : public SPIRVEntryNoId<OpCapability> {
-public:
+ public:
   SPIRVCapability(SPIRVModule *M, SPIRVCapabilityKind K);
   SPIRVCapability() : Kind(CapabilityMatrix) {}
   _SPIRV_DCL_DECODE
 
   SPIRVWord getRequiredSPIRVVersion() const override {
     switch (Kind) {
-    case CapabilityNamedBarrier:
-    case CapabilitySubgroupDispatch:
-      return SPIRV_1_1;
+      case CapabilityNamedBarrier:
+      case CapabilitySubgroupDispatch:
+        return SPIRV_1_1;
 
-    default:
-      return SPIRV_1_0;
+      default:
+        return SPIRV_1_0;
     }
   }
 
-private:
+ private:
   SPIRVCapabilityKind Kind;
 };
 
 class SPIRVModuleProcessed : public SPIRVEntryNoId<OpModuleProcessed> {
-public:
+ public:
   SPIRVModuleProcessed(SPIRVModule *M, const std::string &SS);
   SPIRVModuleProcessed() {}
   _SPIRV_DCL_DECODE
-private:
+ private:
   std::string Str;
 };
 
-typedef SPIRVEntryOpCodeOnly<OpNop> SPIRVNop; // Do nothing
+typedef SPIRVEntryOpCodeOnly<OpNop> SPIRVNop;  // Do nothing
 
-template<class T>
-T* bcast(SPIRVEntry *E) {
-  return static_cast<T*>(E);
+template <class T>
+T *bcast(SPIRVEntry *E) {
+  return static_cast<T *>(E);
 }
 
-template<spv::Op OC>
+template <spv::Op OC>
 bool isa(SPIRVEntry *E) {
   return E ? E->getOpCode() == OC : false;
 }
@@ -739,5 +765,5 @@ _SPIRV_OP(ImageSparseSampleProjDrefImplicitLod)
 _SPIRV_OP(ImageSparseSampleProjDrefExplicitLod)
 #undef _SPIRV_OP
 
-}
+}  // namespace SPIRV
 #endif /* SPIRVENTRY_HPP_ */

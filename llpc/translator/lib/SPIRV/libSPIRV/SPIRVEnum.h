@@ -40,9 +40,10 @@
 #ifndef SPIRV_LIBSPIRV_SPIRVENUM_H
 #define SPIRV_LIBSPIRV_SPIRVENUM_H
 
-#include "spirvExt.h"
-#include "SPIRVOpCode.h"
 #include <cstdint>
+
+#include "SPIRVOpCode.h"
+#include "spirvExt.h"
 using namespace spv;
 
 namespace SPIRV {
@@ -82,14 +83,15 @@ enum SPIRVExtInstSetKind {
   SPIRVEIS_GcnShaderAMD,
   SPIRVEIS_ShaderTrinaryMinMaxAMD,
   SPIRVEIS_NonSemanticInfo,
+  SPIRVEIS_Debug,
   SPIRVEIS_Count,
 };
 
 enum SPIRVTypeWidthKind {
-    SPIRVTW_8Bit = 0x1,
-    SPIRVTW_16Bit = 0x2,
-    SPIRVTW_32Bit = 0x4,
-    SPIRVTW_64Bit = 0x8,
+  SPIRVTW_8Bit = 0x1,
+  SPIRVTW_16Bit = 0x2,
+  SPIRVTW_32Bit = 0x4,
+  SPIRVTW_64Bit = 0x8,
 };
 
 typedef spv::Capability SPIRVCapabilityKind;
@@ -107,31 +109,34 @@ typedef spv::GroupOperation SPIRVGroupOperationKind;
 typedef spv::Dim SPIRVImageDimKind;
 typedef std::vector<SPIRVCapabilityKind> SPIRVCapVec;
 
-template <> inline void SPIRVMap<SPIRVExtInstSetKind, std::string>::init() {
+template <>
+inline void SPIRVMap<SPIRVExtInstSetKind, std::string>::init() {
   add(SPIRVEIS_GLSL, "GLSL.std.450");
   add(SPIRVEIS_ShaderBallotAMD, "SPV_AMD_shader_ballot");
   add(SPIRVEIS_ShaderExplicitVertexParameterAMD,
-    "SPV_AMD_shader_explicit_vertex_parameter");
+      "SPV_AMD_shader_explicit_vertex_parameter");
   add(SPIRVEIS_GcnShaderAMD, "SPV_AMD_gcn_shader");
   add(SPIRVEIS_ShaderTrinaryMinMaxAMD, "SPV_AMD_shader_trinary_minmax");
   add(SPIRVEIS_NonSemanticInfo, "SPV_KHR_non_semantic_info");
 }
 typedef SPIRVMap<SPIRVExtInstSetKind, std::string> SPIRVBuiltinSetNameMap;
 
-template <typename K> SPIRVCapVec getCapability(K Key) {
+template <typename K>
+SPIRVCapVec getCapability(K Key) {
   SPIRVCapVec V;
   SPIRVMap<K, SPIRVCapVec>::find(Key, &V);
   return V;
 }
 
-#define ADD_VEC_INIT(Cap, ...)                                                 \
-  {                                                                            \
-    SPIRVCapabilityKind C[] = __VA_ARGS__;                                     \
-    SPIRVCapVec V(C, C + sizeof(C) / sizeof(C[0]));                            \
-    add(Cap, V);                                                               \
+#define ADD_VEC_INIT(Cap, ...)                      \
+  {                                                 \
+    SPIRVCapabilityKind C[] = __VA_ARGS__;          \
+    SPIRVCapVec V(C, C + sizeof(C) / sizeof(C[0])); \
+    add(Cap, V);                                    \
   }
 
-template <> inline void SPIRVMap<SPIRVCapabilityKind, SPIRVCapVec>::init() {
+template <>
+inline void SPIRVMap<SPIRVCapabilityKind, SPIRVCapVec>::init() {
   ADD_VEC_INIT(CapabilityShader, {CapabilityMatrix});
   ADD_VEC_INIT(CapabilityGeometry, {CapabilityShader});
   ADD_VEC_INIT(CapabilityTessellation, {CapabilityShader});
@@ -168,41 +173,58 @@ template <> inline void SPIRVMap<SPIRVCapabilityKind, SPIRVCapVec>::init() {
   ADD_VEC_INIT(CapabilityStorageImageReadWithoutFormat, {CapabilityShader});
   ADD_VEC_INIT(CapabilityStorageImageWriteWithoutFormat, {CapabilityShader});
   ADD_VEC_INIT(CapabilityMultiViewport, {CapabilityGeometry});
-  ADD_VEC_INIT(CapabilityDrawParameters, { CapabilityShader });
-  ADD_VEC_INIT(CapabilityStencilExportEXT, { CapabilityShader });
-  ADD_VEC_INIT(CapabilityShaderViewportIndexLayerEXT, { CapabilityMultiViewport });
-  ADD_VEC_INIT(CapabilityUniformAndStorageBuffer16BitAccess, { CapabilityStorageBuffer16BitAccess });
-  ADD_VEC_INIT(CapabilityGroupNonUniformVote, { CapabilityGroupNonUniform });
-  ADD_VEC_INIT(CapabilityGroupNonUniformArithmetic, { CapabilityGroupNonUniform });
-  ADD_VEC_INIT(CapabilityGroupNonUniformBallot, { CapabilityGroupNonUniform });
-  ADD_VEC_INIT(CapabilityGroupNonUniformShuffle, { CapabilityGroupNonUniform });
-  ADD_VEC_INIT(CapabilityGroupNonUniformShuffleRelative, { CapabilityGroupNonUniform });
-  ADD_VEC_INIT(CapabilityGroupNonUniformClustered, { CapabilityGroupNonUniform });
-  ADD_VEC_INIT(CapabilityGroupNonUniformQuad, { CapabilityGroupNonUniform });
-  ADD_VEC_INIT(CapabilitySampleMaskPostDepthCoverage, { CapabilityShader });
-  ADD_VEC_INIT(CapabilityStorageBuffer8BitAccess, { CapabilityShader });
-  ADD_VEC_INIT(CapabilityUniformAndStorageBuffer8BitAccess, { CapabilityStorageBuffer8BitAccess });
-  ADD_VEC_INIT(CapabilityStoragePushConstant8, { CapabilityShader });
-  ADD_VEC_INIT(CapabilityImageGatherBiasLodAMD, { CapabilityShader });
-  ADD_VEC_INIT(CapabilityFragmentMaskAMD, { CapabilityShader });
-  ADD_VEC_INIT(CapabilityFloat16ImageAMD, { CapabilityShader });
-  ADD_VEC_INIT(CapabilityVariablePointersStorageBuffer, { CapabilityShader });
-  ADD_VEC_INIT(CapabilityVariablePointers, { CapabilityVariablePointersStorageBuffer });
-  ADD_VEC_INIT(CapabilityShaderNonUniformEXT, { CapabilityShader });
-  ADD_VEC_INIT(CapabilityRuntimeDescriptorArrayEXT, { CapabilityShader });
-  ADD_VEC_INIT(CapabilityInputAttachmentArrayDynamicIndexingEXT, { CapabilityInputAttachment });
-  ADD_VEC_INIT(CapabilityUniformTexelBufferArrayDynamicIndexingEXT, { CapabilitySampledBuffer });
-  ADD_VEC_INIT(CapabilityStorageTexelBufferArrayDynamicIndexingEXT, { CapabilityImageBuffer });
-  ADD_VEC_INIT(CapabilityUniformBufferArrayNonUniformIndexingEXT, { CapabilityShaderNonUniformEXT });
-  ADD_VEC_INIT(CapabilitySampledImageArrayNonUniformIndexingEXT, { CapabilityShaderNonUniformEXT });
-  ADD_VEC_INIT(CapabilityStorageBufferArrayNonUniformIndexingEXT, { CapabilityShaderNonUniformEXT });
-  ADD_VEC_INIT(CapabilityStorageImageArrayNonUniformIndexingEXT, { CapabilityShaderNonUniformEXT });
-  ADD_VEC_INIT(CapabilityInputAttachmentArrayNonUniformIndexingEXT, { CapabilityInputAttachment });
-  ADD_VEC_INIT(CapabilityUniformTexelBufferArrayNonUniformIndexingEXT, { CapabilitySampledBuffer });
-  ADD_VEC_INIT(CapabilityStorageTexelBufferArrayNonUniformIndexingEXT, { CapabilityImageBuffer });
+  ADD_VEC_INIT(CapabilityDrawParameters, {CapabilityShader});
+  ADD_VEC_INIT(CapabilityStencilExportEXT, {CapabilityShader});
+  ADD_VEC_INIT(CapabilityShaderViewportIndexLayerEXT,
+               {CapabilityMultiViewport});
+  ADD_VEC_INIT(CapabilityUniformAndStorageBuffer16BitAccess,
+               {CapabilityStorageBuffer16BitAccess});
+  ADD_VEC_INIT(CapabilityGroupNonUniformVote, {CapabilityGroupNonUniform});
+  ADD_VEC_INIT(CapabilityGroupNonUniformArithmetic,
+               {CapabilityGroupNonUniform});
+  ADD_VEC_INIT(CapabilityGroupNonUniformBallot, {CapabilityGroupNonUniform});
+  ADD_VEC_INIT(CapabilityGroupNonUniformShuffle, {CapabilityGroupNonUniform});
+  ADD_VEC_INIT(CapabilityGroupNonUniformShuffleRelative,
+               {CapabilityGroupNonUniform});
+  ADD_VEC_INIT(CapabilityGroupNonUniformClustered, {CapabilityGroupNonUniform});
+  ADD_VEC_INIT(CapabilityGroupNonUniformQuad, {CapabilityGroupNonUniform});
+  ADD_VEC_INIT(CapabilitySampleMaskPostDepthCoverage, {CapabilityShader});
+  ADD_VEC_INIT(CapabilityStorageBuffer8BitAccess, {CapabilityShader});
+  ADD_VEC_INIT(CapabilityUniformAndStorageBuffer8BitAccess,
+               {CapabilityStorageBuffer8BitAccess});
+  ADD_VEC_INIT(CapabilityStoragePushConstant8, {CapabilityShader});
+  ADD_VEC_INIT(CapabilityImageGatherBiasLodAMD, {CapabilityShader});
+  ADD_VEC_INIT(CapabilityFragmentMaskAMD, {CapabilityShader});
+  ADD_VEC_INIT(CapabilityFloat16ImageAMD, {CapabilityShader});
+  ADD_VEC_INIT(CapabilityVariablePointersStorageBuffer, {CapabilityShader});
+  ADD_VEC_INIT(CapabilityVariablePointers,
+               {CapabilityVariablePointersStorageBuffer});
+  ADD_VEC_INIT(CapabilityShaderNonUniformEXT, {CapabilityShader});
+  ADD_VEC_INIT(CapabilityRuntimeDescriptorArrayEXT, {CapabilityShader});
+  ADD_VEC_INIT(CapabilityInputAttachmentArrayDynamicIndexingEXT,
+               {CapabilityInputAttachment});
+  ADD_VEC_INIT(CapabilityUniformTexelBufferArrayDynamicIndexingEXT,
+               {CapabilitySampledBuffer});
+  ADD_VEC_INIT(CapabilityStorageTexelBufferArrayDynamicIndexingEXT,
+               {CapabilityImageBuffer});
+  ADD_VEC_INIT(CapabilityUniformBufferArrayNonUniformIndexingEXT,
+               {CapabilityShaderNonUniformEXT});
+  ADD_VEC_INIT(CapabilitySampledImageArrayNonUniformIndexingEXT,
+               {CapabilityShaderNonUniformEXT});
+  ADD_VEC_INIT(CapabilityStorageBufferArrayNonUniformIndexingEXT,
+               {CapabilityShaderNonUniformEXT});
+  ADD_VEC_INIT(CapabilityStorageImageArrayNonUniformIndexingEXT,
+               {CapabilityShaderNonUniformEXT});
+  ADD_VEC_INIT(CapabilityInputAttachmentArrayNonUniformIndexingEXT,
+               {CapabilityInputAttachment});
+  ADD_VEC_INIT(CapabilityUniformTexelBufferArrayNonUniformIndexingEXT,
+               {CapabilitySampledBuffer});
+  ADD_VEC_INIT(CapabilityStorageTexelBufferArrayNonUniformIndexingEXT,
+               {CapabilityImageBuffer});
 }
 
-template <> inline void SPIRVMap<SPIRVExecutionModelKind, SPIRVCapVec>::init() {
+template <>
+inline void SPIRVMap<SPIRVExecutionModelKind, SPIRVCapVec>::init() {
   ADD_VEC_INIT(ExecutionModelVertex, {CapabilityShader});
   ADD_VEC_INIT(ExecutionModelTessellationControl, {CapabilityTessellation});
   ADD_VEC_INIT(ExecutionModelTessellationEvaluation, {CapabilityTessellation});
@@ -211,7 +233,8 @@ template <> inline void SPIRVMap<SPIRVExecutionModelKind, SPIRVCapVec>::init() {
   ADD_VEC_INIT(ExecutionModelGLCompute, {CapabilityShader});
 }
 
-template <> inline void SPIRVMap<SPIRVExecutionModeKind, SPIRVCapVec>::init() {
+template <>
+inline void SPIRVMap<SPIRVExecutionModeKind, SPIRVCapVec>::init() {
   ADD_VEC_INIT(ExecutionModeInvocations, {CapabilityGeometry});
   ADD_VEC_INIT(ExecutionModeSpacingEqual, {CapabilityTessellation});
   ADD_VEC_INIT(ExecutionModeSpacingFractionalEven, {CapabilityTessellation});
@@ -241,20 +264,24 @@ template <> inline void SPIRVMap<SPIRVExecutionModeKind, SPIRVCapVec>::init() {
   ADD_VEC_INIT(ExecutionModeOutputPoints, {CapabilityGeometry});
   ADD_VEC_INIT(ExecutionModeOutputLineStrip, {CapabilityGeometry});
   ADD_VEC_INIT(ExecutionModeOutputTriangleStrip, {CapabilityGeometry});
-  ADD_VEC_INIT(ExecutionModePostDepthCoverage, {CapabilitySampleMaskPostDepthCoverage});
+  ADD_VEC_INIT(ExecutionModePostDepthCoverage,
+               {CapabilitySampleMaskPostDepthCoverage});
   ADD_VEC_INIT(ExecutionModeDenormPreserve, {CapabilityDenormPreserve});
   ADD_VEC_INIT(ExecutionModeDenormFlushToZero, {CapabilityDenormFlushToZero});
-  ADD_VEC_INIT(ExecutionModeSignedZeroInfNanPreserve, {CapabilitySignedZeroInfNanPreserve});
+  ADD_VEC_INIT(ExecutionModeSignedZeroInfNanPreserve,
+               {CapabilitySignedZeroInfNanPreserve});
   ADD_VEC_INIT(ExecutionModeRoundingModeRTE, {CapabilityRoundingModeRTE});
   ADD_VEC_INIT(ExecutionModeRoundingModeRTZ, {CapabilityRoundingModeRTZ});
 }
 
-template <> inline void SPIRVMap<SPIRVMemoryModelKind, SPIRVCapVec>::init() {
+template <>
+inline void SPIRVMap<SPIRVMemoryModelKind, SPIRVCapVec>::init() {
   ADD_VEC_INIT(MemoryModelSimple, {CapabilityShader});
   ADD_VEC_INIT(MemoryModelGLSL450, {CapabilityShader});
 }
 
-template <> inline void SPIRVMap<SPIRVStorageClassKind, SPIRVCapVec>::init() {
+template <>
+inline void SPIRVMap<SPIRVStorageClassKind, SPIRVCapVec>::init() {
   ADD_VEC_INIT(StorageClassInput, {CapabilityShader});
   ADD_VEC_INIT(StorageClassUniform, {CapabilityShader});
   ADD_VEC_INIT(StorageClassOutput, {CapabilityShader});
@@ -262,10 +289,11 @@ template <> inline void SPIRVMap<SPIRVStorageClassKind, SPIRVCapVec>::init() {
   ADD_VEC_INIT(StorageClassGeneric, {CapabilityGenericPointer});
   ADD_VEC_INIT(StorageClassPushConstant, {CapabilityShader});
   ADD_VEC_INIT(StorageClassAtomicCounter, {CapabilityAtomicStorage});
-  ADD_VEC_INIT(StorageClassStorageBuffer, { CapabilityShader });
+  ADD_VEC_INIT(StorageClassStorageBuffer, {CapabilityShader});
 }
 
-template <> inline void SPIRVMap<SPIRVImageDimKind, SPIRVCapVec>::init() {
+template <>
+inline void SPIRVMap<SPIRVImageDimKind, SPIRVCapVec>::init() {
   ADD_VEC_INIT(Dim1D, {CapabilitySampled1D});
   ADD_VEC_INIT(DimCube, {CapabilityShader});
   ADD_VEC_INIT(DimRect, {CapabilitySampledRect});
@@ -273,7 +301,8 @@ template <> inline void SPIRVMap<SPIRVImageDimKind, SPIRVCapVec>::init() {
   ADD_VEC_INIT(DimSubpassData, {CapabilityInputAttachment});
 }
 
-template <> inline void SPIRVMap<ImageFormat, SPIRVCapVec>::init() {
+template <>
+inline void SPIRVMap<ImageFormat, SPIRVCapVec>::init() {
   ADD_VEC_INIT(ImageFormatRgba32f, {CapabilityShader});
   ADD_VEC_INIT(ImageFormatRgba16f, {CapabilityShader});
   ADD_VEC_INIT(ImageFormatR32f, {CapabilityShader});
@@ -315,13 +344,15 @@ template <> inline void SPIRVMap<ImageFormat, SPIRVCapVec>::init() {
   ADD_VEC_INIT(ImageFormatR8ui, {CapabilityStorageImageExtendedFormats});
 }
 
-template <> inline void SPIRVMap<ImageOperandsMask, SPIRVCapVec>::init() {
+template <>
+inline void SPIRVMap<ImageOperandsMask, SPIRVCapVec>::init() {
   ADD_VEC_INIT(ImageOperandsBiasMask, {CapabilityShader});
   ADD_VEC_INIT(ImageOperandsOffsetMask, {CapabilityImageGatherExtended});
   ADD_VEC_INIT(ImageOperandsMinLodMask, {CapabilityMinLod});
 }
 
-template <> inline void SPIRVMap<Decoration, SPIRVCapVec>::init() {
+template <>
+inline void SPIRVMap<Decoration, SPIRVCapVec>::init() {
   ADD_VEC_INIT(DecorationRelaxedPrecision, {CapabilityShader});
   ADD_VEC_INIT(DecorationSpecId, {CapabilityShader});
   ADD_VEC_INIT(DecorationBlock, {CapabilityShader});
@@ -340,7 +371,7 @@ template <> inline void SPIRVMap<Decoration, SPIRVCapVec>::init() {
   ADD_VEC_INIT(DecorationInvariant, {CapabilityShader});
   ADD_VEC_INIT(DecorationUniform, {CapabilityShader});
 #if SPV_VERSION >= 0x10400
-  ADD_VEC_INIT(DecorationUniformId, { CapabilityShader });
+  ADD_VEC_INIT(DecorationUniformId, {CapabilityShader});
 #endif
   ADD_VEC_INIT(DecorationStream, {CapabilityGeometryStreams});
   ADD_VEC_INIT(DecorationLocation, {CapabilityShader});
@@ -354,10 +385,11 @@ template <> inline void SPIRVMap<Decoration, SPIRVCapVec>::init() {
   ADD_VEC_INIT(DecorationLinkageAttributes, {CapabilityLinkage});
   ADD_VEC_INIT(DecorationNoContraction, {CapabilityShader});
   ADD_VEC_INIT(DecorationInputAttachmentIndex, {CapabilityInputAttachment});
-  ADD_VEC_INIT(DecorationNonUniformEXT, { CapabilityShaderNonUniformEXT });
+  ADD_VEC_INIT(DecorationNonUniformEXT, {CapabilityShaderNonUniformEXT});
 }
 
-template <> inline void SPIRVMap<BuiltIn, SPIRVCapVec>::init() {
+template <>
+inline void SPIRVMap<BuiltIn, SPIRVCapVec>::init() {
   ADD_VEC_INIT(BuiltInPosition, {CapabilityShader});
   ADD_VEC_INIT(BuiltInPointSize, {CapabilityShader});
   ADD_VEC_INIT(BuiltInClipDistance, {CapabilityClipDistance});
@@ -383,27 +415,28 @@ template <> inline void SPIRVMap<BuiltIn, SPIRVCapVec>::init() {
   ADD_VEC_INIT(BuiltInFragDepth, {CapabilityShader});
   ADD_VEC_INIT(BuiltInHelperInvocation, {CapabilityShader});
   ADD_VEC_INIT(BuiltInSubgroupSize,
-              {CapabilityGroupNonUniform, CapabilitySubgroupBallotKHR});
+               {CapabilityGroupNonUniform, CapabilitySubgroupBallotKHR});
   ADD_VEC_INIT(BuiltInNumSubgroups, {CapabilityGroupNonUniform});
   ADD_VEC_INIT(BuiltInSubgroupId, {CapabilityGroupNonUniform});
   ADD_VEC_INIT(BuiltInSubgroupLocalInvocationId,
-              {CapabilityGroupNonUniform, CapabilitySubgroupBallotKHR});
+               {CapabilityGroupNonUniform, CapabilitySubgroupBallotKHR});
   ADD_VEC_INIT(BuiltInVertexIndex, {CapabilityShader});
   ADD_VEC_INIT(BuiltInInstanceIndex, {CapabilityShader});
-  ADD_VEC_INIT(BuiltInBaseVertex, { CapabilityDrawParameters });
-  ADD_VEC_INIT(BuiltInBaseInstance, { CapabilityDrawParameters });
-  ADD_VEC_INIT(BuiltInDrawIndex, { CapabilityDrawParameters });
-  ADD_VEC_INIT(BuiltInFragStencilRefEXT, { CapabilityStencilExportEXT });
-  ADD_VEC_INIT(BuiltInSubgroupEqMaskKHR, { CapabilitySubgroupBallotKHR });
-  ADD_VEC_INIT(BuiltInSubgroupGeMaskKHR, { CapabilitySubgroupBallotKHR });
-  ADD_VEC_INIT(BuiltInSubgroupGtMaskKHR, { CapabilitySubgroupBallotKHR });
-  ADD_VEC_INIT(BuiltInSubgroupLeMaskKHR, { CapabilitySubgroupBallotKHR });
-  ADD_VEC_INIT(BuiltInSubgroupLtMaskKHR, { CapabilitySubgroupBallotKHR });
-  ADD_VEC_INIT(BuiltInDeviceIndex, { CapabilityDeviceGroup });
-  ADD_VEC_INIT(BuiltInViewIndex, { CapabilityMultiView });
+  ADD_VEC_INIT(BuiltInBaseVertex, {CapabilityDrawParameters});
+  ADD_VEC_INIT(BuiltInBaseInstance, {CapabilityDrawParameters});
+  ADD_VEC_INIT(BuiltInDrawIndex, {CapabilityDrawParameters});
+  ADD_VEC_INIT(BuiltInFragStencilRefEXT, {CapabilityStencilExportEXT});
+  ADD_VEC_INIT(BuiltInSubgroupEqMaskKHR, {CapabilitySubgroupBallotKHR});
+  ADD_VEC_INIT(BuiltInSubgroupGeMaskKHR, {CapabilitySubgroupBallotKHR});
+  ADD_VEC_INIT(BuiltInSubgroupGtMaskKHR, {CapabilitySubgroupBallotKHR});
+  ADD_VEC_INIT(BuiltInSubgroupLeMaskKHR, {CapabilitySubgroupBallotKHR});
+  ADD_VEC_INIT(BuiltInSubgroupLtMaskKHR, {CapabilitySubgroupBallotKHR});
+  ADD_VEC_INIT(BuiltInDeviceIndex, {CapabilityDeviceGroup});
+  ADD_VEC_INIT(BuiltInViewIndex, {CapabilityMultiView});
 }
 
-template <> inline void SPIRVMap<MemorySemanticsMask, SPIRVCapVec>::init() {
+template <>
+inline void SPIRVMap<MemorySemanticsMask, SPIRVCapVec>::init() {
   ADD_VEC_INIT(MemorySemanticsUniformMemoryMask, {CapabilityShader});
   ADD_VEC_INIT(MemorySemanticsAtomicCounterMemoryMask,
                {CapabilityAtomicStorage});
@@ -413,20 +446,20 @@ template <> inline void SPIRVMap<MemorySemanticsMask, SPIRVCapVec>::init() {
 
 inline unsigned getImageDimension(SPIRVImageDimKind K) {
   switch (K) {
-  case Dim1D:
-    return 1;
-  case Dim2D:
-    return 2;
-  case Dim3D:
-    return 3;
-  case DimCube:
-    return 2;
-  case DimRect:
-    return 2;
-  case DimBuffer:
-    return 1;
-  default:
-    return 0;
+    case Dim1D:
+      return 1;
+    case Dim2D:
+      return 2;
+    case Dim3D:
+      return 3;
+    case DimCube:
+      return 2;
+    case DimRect:
+      return 2;
+    case DimBuffer:
+      return 1;
+    default:
+      return 0;
   }
 }
 
@@ -435,6 +468,6 @@ inline unsigned extractSPIRVMemOrderSemantic(unsigned Sema) {
   return Sema & KSpirvMemOrderSemanticMask;
 }
 
-} // namespace SPIRV
+}  // namespace SPIRV
 
-#endif // SPIRV_LIBSPIRV_SPIRVENUM_H
+#endif  // SPIRV_LIBSPIRV_SPIRVENUM_H

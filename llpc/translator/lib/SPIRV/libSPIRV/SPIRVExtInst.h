@@ -1,4 +1,5 @@
-//===- SPIRVBuiltin.h - SPIR-V extended instruction --------------*- C++ -*-===//
+//===- SPIRVBuiltin.h - SPIR-V extended instruction --------------*- C++
+//-*-===//
 //
 //                     The LLVM/SPIRV Translator
 //
@@ -40,11 +41,12 @@
 #ifndef SPIRV_LIBSPIRV_SPIRVEXTINST_H
 #define SPIRV_LIBSPIRV_SPIRVEXTINST_H
 
-#include "SPIRVEnum.h"
-#include "SPIRVUtil.h"
-
 #include <string>
 #include <vector>
+
+#include "SPIRV.debug.h"
+#include "SPIRVEnum.h"
+#include "SPIRVUtil.h"
 
 namespace SPIRV {
 
@@ -54,7 +56,8 @@ inline bool isGLSLBuiltinSet(SPIRVExtInstSetKind Set) {
 
 typedef GLSLstd450 GLSLExtOpKind;
 
-template<> inline void SPIRVMap<GLSLExtOpKind, std::string>::init() {
+template <>
+inline void SPIRVMap<GLSLExtOpKind, std::string>::init() {
   add(GLSLstd450Round, "round");
   add(GLSLstd450RoundEven, "roundEven");
   add(GLSLstd450Trunc, "trunc");
@@ -151,7 +154,8 @@ SPIRV_DEF_NAMEMAP(GLSLExtOpKind, GLSLExtOpMap)
 
 typedef ShaderBallotAMD ShaderBallotAMDExtOpKind;
 
-template<> inline void SPIRVMap<ShaderBallotAMDExtOpKind, std::string>::init() {
+template <>
+inline void SPIRVMap<ShaderBallotAMDExtOpKind, std::string>::init() {
   add(SwizzleInvocationsAMD, "SwizzleInvocationsAMD");
   add(SwizzleInvocationsMaskedAMD, "SwizzleInvocationsMaskedAMD");
   add(WriteInvocationAMD, "WriteInvocationAMD");
@@ -160,18 +164,20 @@ template<> inline void SPIRVMap<ShaderBallotAMDExtOpKind, std::string>::init() {
 SPIRV_DEF_NAMEMAP(ShaderBallotAMDExtOpKind, ShaderBallotAMDExtOpMap)
 
 typedef ShaderExplicitVertexParameterAMD
-  ShaderExplicitVertexParameterAMDExtOpKind;
+    ShaderExplicitVertexParameterAMDExtOpKind;
 
-template<> inline void
+template <>
+inline void
 SPIRVMap<ShaderExplicitVertexParameterAMDExtOpKind, std::string>::init() {
   add(InterpolateAtVertexAMD, "InterpolateAtVertexAMD");
 }
 SPIRV_DEF_NAMEMAP(ShaderExplicitVertexParameterAMDExtOpKind,
-  ShaderExplicitVertexParameterAMDExtOpMap)
+                  ShaderExplicitVertexParameterAMDExtOpMap)
 
 typedef GcnShaderAMD GcnShaderAMDExtOpKind;
 
-template<> inline void SPIRVMap<GcnShaderAMDExtOpKind, std::string>::init() {
+template <>
+inline void SPIRVMap<GcnShaderAMDExtOpKind, std::string>::init() {
   add(CubeFaceIndexAMD, "CubeFaceIndexAMD");
   add(CubeFaceCoordAMD, "CubeFaceCoordAMD");
   add(TimeAMD, "TimeAMD");
@@ -181,8 +187,8 @@ SPIRV_DEF_NAMEMAP(GcnShaderAMDExtOpKind, GcnShaderAMDExtOpMap)
 
 typedef ShaderTrinaryMinMaxAMD ShaderTrinaryMinMaxAMDExtOpKind;
 
-template<> inline void
-SPIRVMap<ShaderTrinaryMinMaxAMDExtOpKind, std::string>::init() {
+template <>
+inline void SPIRVMap<ShaderTrinaryMinMaxAMDExtOpKind, std::string>::init() {
   add(FMin3AMD, "FMin3AMD");
   add(UMin3AMD, "UMin3AMD");
   add(SMin3AMD, "SMin3AMD");
@@ -195,10 +201,51 @@ SPIRVMap<ShaderTrinaryMinMaxAMDExtOpKind, std::string>::init() {
 }
 
 SPIRV_DEF_NAMEMAP(ShaderTrinaryMinMaxAMDExtOpKind,
-  ShaderTrinaryMinMaxAMDExtOpMap)
+                  ShaderTrinaryMinMaxAMDExtOpMap)
 
 typedef uint32_t NonSemanticInfoExtOpKind;
 
+typedef SPIRVDebug::Instruction SPIRVDebugExtOpKind;
+template <>
+inline void SPIRVMap<SPIRVDebugExtOpKind, std::string>::init() {
+  add(SPIRVDebug::DebugInfoNone, "DebugInfoNone");
+  add(SPIRVDebug::CompilationUnit, "DebugCompileUnit");
+  add(SPIRVDebug::Source, "DebugSource");
+  add(SPIRVDebug::TypeBasic, "DebugTypeBasic");
+  add(SPIRVDebug::TypePointer, "DebugTypePointer");
+  add(SPIRVDebug::TypeArray, "DebugTypeArray");
+  add(SPIRVDebug::TypeVector, "DebugTypeVector");
+  add(SPIRVDebug::TypeQualifier, "DebugTypeQualifier");
+  add(SPIRVDebug::TypeFunction, "DebugTypeFunction");
+  add(SPIRVDebug::TypeComposite, "DebugTypeComposite");
+  add(SPIRVDebug::TypeMember, "DebugTypeMember");
+  add(SPIRVDebug::TypeEnum, "DebugTypeEnum");
+  add(SPIRVDebug::Typedef, "DebugTypedef");
+  add(SPIRVDebug::TypeTemplateParameter, "DebugTemplateParameter");
+  add(SPIRVDebug::TypeTemplateParameterPack, "DebugTemplateParameterPack");
+  add(SPIRVDebug::TypeTemplateTemplateParameter,
+      "DebugTemplateTemplateParameter");
+  add(SPIRVDebug::TypeTemplate, "DebugTemplate");
+  add(SPIRVDebug::TypePtrToMember, "DebugTypePtrToMember,");
+  add(SPIRVDebug::Inheritance, "DebugInheritance");
+  add(SPIRVDebug::Function, "DebugFunction");
+  add(SPIRVDebug::FunctionDecl, "DebugFunctionDecl");
+  add(SPIRVDebug::LexicalBlock, "DebugLexicalBlock");
+  add(SPIRVDebug::LexicalBlockDiscriminator, "LexicalBlockDiscriminator");
+  add(SPIRVDebug::LocalVariable, "DebugLocalVariable");
+  add(SPIRVDebug::InlinedVariable, "DebugInlinedVariable");
+  add(SPIRVDebug::GlobalVariable, "DebugGlobalVariable");
+  add(SPIRVDebug::Declare, "DebugDeclare");
+  add(SPIRVDebug::Value, "DebugValue");
+  add(SPIRVDebug::Scope, "DebugScope");
+  add(SPIRVDebug::NoScope, "DebugNoScope");
+  add(SPIRVDebug::InlinedAt, "DebugInlinedAt");
+  add(SPIRVDebug::ImportedEntity, "DebugImportedEntity");
+  add(SPIRVDebug::Expression, "DebugExpression");
+  add(SPIRVDebug::Operation, "DebugOperation");
 }
+SPIRV_DEF_NAMEMAP(SPIRVDebugExtOpKind, SPIRVDebugExtOpMap)
 
-#endif // SPIRV_LIBSPIRV_SPIRVEXTINST_H
+}  // namespace SPIRV
+
+#endif  // SPIRV_LIBSPIRV_SPIRVEXTINST_H

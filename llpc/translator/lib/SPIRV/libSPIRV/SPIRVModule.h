@@ -1,4 +1,5 @@
-//===- SPIRVModule.h - Class to represent a SPIR-V module --------*- C++ -*-===//
+//===- SPIRVModule.h - Class to represent a SPIR-V module --------*- C++
+//-*-===//
 //
 //                     The LLVM/SPIRV Translator
 //
@@ -40,14 +41,14 @@
 #ifndef SPIRV_LIBSPIRV_SPIRVMODULE_H
 #define SPIRV_LIBSPIRV_SPIRVMODULE_H
 
-#include "SPIRVEntry.h"
-
 #include <iostream>
 #include <set>
 #include <string>
 #include <unordered_map>
 #include <unordered_set>
 #include <vector>
+
+#include "SPIRVEntry.h"
 
 namespace SPIRV {
 
@@ -82,7 +83,7 @@ typedef SPIRVBasicBlock SPIRVLabel;
 struct SPIRVTypeImageDescriptor;
 
 class SPIRVModule {
-public:
+ public:
   typedef std::map<SPIRVCapabilityKind, SPIRVCapability *> SPIRVCapMap;
 
   static SPIRVModule *createSPIRVModule();
@@ -92,7 +93,8 @@ public:
   // Object query functions
   virtual bool exist(SPIRVId) const = 0;
   virtual bool exist(SPIRVId, SPIRVEntry **) const = 0;
-  template <class T> T *get(SPIRVId Id) const {
+  template <class T>
+  T *get(SPIRVId Id) const {
     return static_cast<T *>(getEntry(Id));
   }
   virtual SPIRVEntry *getEntry(SPIRVId) const = 0;
@@ -122,23 +124,27 @@ public:
   virtual SourceLanguage getSourceLanguage(SPIRVWord *) const = 0;
   virtual std::set<std::string> &getSourceExtension() = 0;
   virtual SPIRVValue *getValue(SPIRVId TheId) const = 0;
-  virtual std::vector<SPIRVValue *>
-  getValues(const std::vector<SPIRVId> &) const = 0;
-  virtual std::vector<SPIRVId>
-  getIds(const std::vector<SPIRVEntry *> &) const = 0;
-  virtual std::vector<SPIRVId>
-  getIds(const std::vector<SPIRVValue *> &) const = 0;
-  virtual SPIRVType *getValueType(SPIRVId TheId)const = 0;
-  virtual std::vector<SPIRVType *>
-  getValueTypes(const std::vector<SPIRVId> &) const = 0;
+  virtual std::vector<SPIRVValue *> getValues(
+      const std::vector<SPIRVId> &) const = 0;
+  virtual std::vector<SPIRVId> getIds(
+      const std::vector<SPIRVEntry *> &) const = 0;
+  virtual std::vector<SPIRVId> getIds(
+      const std::vector<SPIRVValue *> &) const = 0;
+  virtual SPIRVType *getValueType(SPIRVId TheId) const = 0;
+  virtual std::vector<SPIRVType *> getValueTypes(
+      const std::vector<SPIRVId> &) const = 0;
   virtual SPIRVConstant *getLiteralAsConstant(unsigned Literal) = 0;
   virtual SPIRVEntryPoint *getEntryPoint(SPIRVId) const = 0;
-  virtual SPIRVEntryPoint *
-  getEntryPoint(SPIRVExecutionModelKind, const char *) const = 0;
+  virtual SPIRVEntryPoint *getEntryPoint(SPIRVExecutionModelKind,
+                                         const char *) const = 0;
+  virtual bool isEntryPoint(SPIRVExecutionModelKind ExecModel,
+                            SPIRVId EP) const = 0;
 
   virtual unsigned short getGeneratorId() const = 0;
   virtual unsigned short getGeneratorVer() const = 0;
   virtual SPIRVWord getSPIRVVersion() const = 0;
+
+  virtual const std::vector<SPIRVExtInst *> &getDebugInstVec() const = 0;
 
   // Module changing functions
   virtual bool importBuiltinSet(const std::string &, SPIRVId *) = 0;
@@ -160,7 +166,8 @@ public:
   }
 
   // Object creation functions
-  template <class T> T *add(T *Entry) {
+  template <class T>
+  T *add(T *Entry) {
     addEntry(Entry);
     return Entry;
   }
@@ -177,18 +184,19 @@ public:
                        SPIRVWord Column) = 0;
   virtual const std::shared_ptr<const SPIRVLine> &getCurrentLine() const = 0;
   virtual void setCurrentLine(const std::shared_ptr<const SPIRVLine> &) = 0;
-  virtual const SPIRVDecorateGeneric *addDecorate(const SPIRVDecorateGeneric *) = 0;
+  virtual const SPIRVDecorateGeneric *addDecorate(
+      const SPIRVDecorateGeneric *) = 0;
   virtual SPIRVDecorationGroup *addDecorationGroup() = 0;
-  virtual SPIRVDecorationGroup *
-  addDecorationGroup(SPIRVDecorationGroup *Group) = 0;
-  virtual SPIRVGroupDecorate *
-  addGroupDecorate(SPIRVDecorationGroup *Group,
-                   const std::vector<SPIRVEntry *> &Targets) = 0;
-  virtual SPIRVGroupMemberDecorate *
-  addGroupMemberDecorate(SPIRVDecorationGroup *Group,
-                         const std::vector<SPIRVEntry *> &Targets) = 0;
-  virtual SPIRVGroupDecorateGeneric *
-  addGroupDecorateGeneric(SPIRVGroupDecorateGeneric *GDec) = 0;
+  virtual SPIRVDecorationGroup *addDecorationGroup(
+      SPIRVDecorationGroup *Group) = 0;
+  virtual SPIRVGroupDecorate *addGroupDecorate(
+      SPIRVDecorationGroup *Group,
+      const std::vector<SPIRVEntry *> &Targets) = 0;
+  virtual SPIRVGroupMemberDecorate *addGroupMemberDecorate(
+      SPIRVDecorationGroup *Group,
+      const std::vector<SPIRVEntry *> &Targets) = 0;
+  virtual SPIRVGroupDecorateGeneric *addGroupDecorateGeneric(
+      SPIRVGroupDecorateGeneric *GDec) = 0;
   virtual void addEntryPoint(SPIRVEntryPoint *EntryPoint) = 0;
   virtual SPIRVForward *addForward(SPIRVType *Ty) = 0;
   virtual SPIRVForward *addForward(SPIRVId, SPIRVType *Ty) = 0;
@@ -202,8 +210,8 @@ public:
   virtual SPIRVTypeArray *addArrayType(SPIRVType *, SPIRVConstant *) = 0;
   virtual SPIRVTypeBool *addBoolType() = 0;
   virtual SPIRVTypeFloat *addFloatType(unsigned) = 0;
-  virtual SPIRVTypeFunction *
-  addFunctionType(SPIRVType *, const std::vector<SPIRVType *> &) = 0;
+  virtual SPIRVTypeFunction *addFunctionType(
+      SPIRVType *, const std::vector<SPIRVType *> &) = 0;
   virtual SPIRVTypeImage *addImageType(SPIRVType *,
                                        const SPIRVTypeImageDescriptor &) = 0;
   virtual SPIRVTypeSampler *addSamplerType() = 0;
@@ -216,8 +224,8 @@ public:
   virtual void createForwardPointers() = 0;
 
   // Constants creation functions
-  virtual SPIRVValue *
-  addCompositeConstant(SPIRVType *, const std::vector<SPIRVValue *> &) = 0;
+  virtual SPIRVValue *addCompositeConstant(
+      SPIRVType *, const std::vector<SPIRVValue *> &) = 0;
   virtual SPIRVValue *addConstant(SPIRVValue *) = 0;
   virtual SPIRVValue *addConstant(SPIRVType *, uint64_t) = 0;
   virtual SPIRVValue *addDoubleConstant(SPIRVTypeFloat *, double) = 0;
@@ -243,9 +251,9 @@ public:
                                        const std::vector<SPIRVValue *> &,
                                        SPIRVBasicBlock *) = 0;
   virtual void addCapability(SPIRVCapabilityKind) = 0;
-  template <typename T> void addCapabilities(const T &Caps) {
-    for (auto I : Caps)
-      addCapability(I);
+  template <typename T>
+  void addCapabilities(const T &Caps) {
+    for (auto I : Caps) addCapability(I);
   }
   /// Used by SPIRV entries to add required capability internally.
   /// Should not be used by users directly.
@@ -253,24 +261,22 @@ public:
   virtual SPIRVInstruction *addCallInst(SPIRVFunction *,
                                         const std::vector<SPIRVWord> &,
                                         SPIRVBasicBlock *) = 0;
-  virtual SPIRVInstruction *
-  addCompositeConstructInst(SPIRVType *, const std::vector<SPIRVId> &,
-                            SPIRVBasicBlock *) = 0;
-  virtual SPIRVInstruction *
-  addCompositeExtractInst(SPIRVType *, SPIRVValue *,
-                          const std::vector<SPIRVWord> &,
-                          SPIRVBasicBlock *) = 0;
-  virtual SPIRVInstruction *
-  addCompositeInsertInst(SPIRVValue *, SPIRVValue *,
-                         const std::vector<SPIRVWord> &, SPIRVBasicBlock *) = 0;
+  virtual SPIRVInstruction *addCompositeConstructInst(
+      SPIRVType *, const std::vector<SPIRVId> &, SPIRVBasicBlock *) = 0;
+  virtual SPIRVInstruction *addCompositeExtractInst(
+      SPIRVType *, SPIRVValue *, const std::vector<SPIRVWord> &,
+      SPIRVBasicBlock *) = 0;
+  virtual SPIRVInstruction *addCompositeInsertInst(
+      SPIRVValue *, SPIRVValue *, const std::vector<SPIRVWord> &,
+      SPIRVBasicBlock *) = 0;
   virtual SPIRVInstruction *addCopyObjectInst(SPIRVType *, SPIRVValue *,
                                               SPIRVBasicBlock *) = 0;
   virtual SPIRVInstruction *addCopyMemoryInst(SPIRVValue *, SPIRVValue *,
                                               const std::vector<SPIRVWord> &,
                                               SPIRVBasicBlock *) = 0;
-  virtual SPIRVInstruction *
-  addCopyMemorySizedInst(SPIRVValue *, SPIRVValue *, SPIRVValue *,
-                         const std::vector<SPIRVWord> &, SPIRVBasicBlock *) = 0;
+  virtual SPIRVInstruction *addCopyMemorySizedInst(
+      SPIRVValue *, SPIRVValue *, SPIRVValue *, const std::vector<SPIRVWord> &,
+      SPIRVBasicBlock *) = 0;
   virtual SPIRVInstruction *addCmpInst(Op, SPIRVType *, SPIRVValue *,
                                        SPIRVValue *, SPIRVBasicBlock *) = 0;
   virtual SPIRVInstruction *addControlBarrierInst(SPIRVValue *ExecKind,
@@ -283,9 +289,9 @@ public:
                                          SPIRVBasicBlock *BB) = 0;
   virtual SPIRVInstTemplateBase *addInstTemplate(Op OC, SPIRVBasicBlock *BB,
                                                  SPIRVType *Ty) = 0;
-  virtual SPIRVInstTemplateBase *
-  addInstTemplate(Op OC, const std::vector<SPIRVWord> &Ops, SPIRVBasicBlock *BB,
-                  SPIRVType *Ty) = 0;
+  virtual SPIRVInstTemplateBase *addInstTemplate(
+      Op OC, const std::vector<SPIRVWord> &Ops, SPIRVBasicBlock *BB,
+      SPIRVType *Ty) = 0;
   virtual SPIRVInstruction *addLoadInst(SPIRVValue *,
                                         const std::vector<SPIRVWord> &,
                                         SPIRVBasicBlock *) = 0;
@@ -303,11 +309,9 @@ public:
   virtual SPIRVInstruction *addSelectionMergeInst(SPIRVId MergeBlock,
                                                   SPIRVWord SelectionControl,
                                                   SPIRVBasicBlock *BB) = 0;
-  virtual SPIRVInstruction *addLoopMergeInst(SPIRVId MergeBlock,
-                                             SPIRVId ContinueTarget,
-                                             SPIRVWord LoopControl,
-                                             std::vector<SPIRVWord> LoopControlParameters,
-                                             SPIRVBasicBlock *BB) = 0;
+  virtual SPIRVInstruction *addLoopMergeInst(
+      SPIRVId MergeBlock, SPIRVId ContinueTarget, SPIRVWord LoopControl,
+      std::vector<SPIRVWord> LoopControlParameters, SPIRVBasicBlock *BB) = 0;
   virtual SPIRVInstruction *addStoreInst(SPIRVValue *, SPIRVValue *,
                                          const std::vector<SPIRVWord> &,
                                          SPIRVBasicBlock *) = 0;
@@ -328,10 +332,9 @@ public:
                                         SPIRVValue *, const std::string &,
                                         SPIRVStorageClassKind,
                                         SPIRVBasicBlock *) = 0;
-  virtual SPIRVValue *
-  addVectorShuffleInst(SPIRVType *Type, SPIRVValue *Vec1, SPIRVValue *Vec2,
-                       const std::vector<SPIRVWord> &Components,
-                       SPIRVBasicBlock *BB) = 0;
+  virtual SPIRVValue *addVectorShuffleInst(
+      SPIRVType *Type, SPIRVValue *Vec1, SPIRVValue *Vec2,
+      const std::vector<SPIRVWord> &Components, SPIRVBasicBlock *BB) = 0;
   virtual SPIRVInstruction *addVectorExtractDynamicInst(SPIRVValue *,
                                                         SPIRVValue *,
                                                         SPIRVBasicBlock *) = 0;
@@ -342,23 +345,23 @@ public:
   // Input functions
   friend std::istream &operator>>(std::istream &I, SPIRVModule &M);
 
-protected:
+ protected:
   bool AutoAddCapability;
   bool ValidateCapability;
 };
 
 class SPIRVDbgInfo {
-public:
+ public:
   SPIRVDbgInfo(SPIRVModule *TM);
   std::string getEntryPointFileStr(SPIRVExecutionModelKind, unsigned);
   std::string getFunctionFileStr(SPIRVFunction *);
   unsigned getFunctionLineNo(SPIRVFunction *);
 
-private:
+ private:
   std::unordered_map<SPIRVFunction *, SPIRVLine *> FuncMap;
   const std::string ModuleFileStr;
   SPIRVModule *M;
 };
-} // namespace SPIRV
+}  // namespace SPIRV
 
-#endif // SPIRV_LIBSPIRV_SPIRVMODULE_H
+#endif  // SPIRV_LIBSPIRV_SPIRVMODULE_H

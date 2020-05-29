@@ -76,7 +76,10 @@ public:
   bool exist(SPIRVId, SPIRVEntry **) const override;
   SPIRVId getId(SPIRVId Id = SPIRVID_INVALID, unsigned Increment = 1);
   SPIRVEntry *getEntry(SPIRVId Id) const override;
-  bool hasDebugInfo() const override { return !StringVec.empty(); }
+  // If we have at least on OpLine in the module the CurrentLine is non-empty
+  bool hasDebugInfo() const override {
+    return CurrentLine.get() || !DebugInstVec.empty();
+  }
 
   // Error handling functions
   SPIRVErrorLog &getErrorLog() override { return ErrLog; }
@@ -143,9 +146,14 @@ public:
   virtual SPIRVEntryPoint* getEntryPoint(SPIRVId) const override;
   virtual SPIRVEntryPoint*
   getEntryPoint(SPIRVExecutionModelKind, const char *) const override;
+  virtual bool isEntryPoint(SPIRVExecutionModelKind ExecModel,
+                            SPIRVId EP) const override;
   unsigned short getGeneratorId() const override { return GeneratorId; }
   unsigned short getGeneratorVer() const override { return GeneratorVer; }
   SPIRVWord getSPIRVVersion() const override { return SPIRVVersion; }
+  const std::vector<SPIRVExtInst *> &getDebugInstVec() const override {
+    return DebugInstVec;
+  }
   bool isNonSemanticInfoInstSet(llvm::StringRef setName) const;
 
   // Module changing functions
@@ -393,6 +401,7 @@ private:
   SPIRVUnknownStructFieldMap UnknownStructFieldMap;
   std::map<unsigned, SPIRVTypeInt *> IntTypeMap;
   std::map<unsigned, SPIRVConstant *> LiteralMap;
+  std::vector<SPIRVExtInst *> DebugInstVec;
 
   void layoutEntry(SPIRVEntry *Entry);
 };
@@ -621,6 +630,18 @@ SPIRVModuleImpl::getEntryPoint(SPIRVExecutionModelKind ExecModel,
       return EntryPoint;
   }
   return nullptr;
+}
+
+bool SPIRVModuleImpl::isEntryPoint(SPIRVExecutionModelKind ExecModel,
+                                   SPIRVId EP) const {
+  assert(isValid(ExecModel) && "Invalid execution model");
+  assert(EP != SPIRVID_INVALID && "Invalid function id");
+  for (auto EntryPoint : EntryPointVec) {
+    if (EntryPoint->getExecModel() == ExecModel &&
+        EntryPoint->getTargetId() == EP)
+      return true;
+  }
+  return false;
 }
 
 // Module change functions
