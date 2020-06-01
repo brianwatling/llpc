@@ -131,6 +131,7 @@ target_include_directories(llpc
         ${PROJECT_SOURCE_DIR}/include
         ${PROJECT_SOURCE_DIR}/lower
         ${PROJECT_SOURCE_DIR}/translator/include
+        ${PROJECT_SOURCE_DIR}/translator/lib
         ${PROJECT_SOURCE_DIR}/translator/lib/SPIRV
         ${PROJECT_SOURCE_DIR}/translator/lib/SPIRV/libSPIRV
         ${PROJECT_SOURCE_DIR}/util
@@ -190,6 +191,7 @@ if(ICD_BUILD_LLPC)
         translator/lib/SPIRV/libSPIRV/SPIRVInstruction.cpp
         translator/lib/SPIRV/libSPIRV/SPIRVModule.cpp
         translator/lib/SPIRV/libSPIRV/SPIRVStream.cpp
+        translator/lib/SPIRV/libSPIRV/SPIRVToLLVMDbgTran.cpp
         translator/lib/SPIRV/libSPIRV/SPIRVType.cpp
         translator/lib/SPIRV/libSPIRV/SPIRVValue.cpp
     )

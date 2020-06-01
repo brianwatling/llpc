@@ -51,33 +51,42 @@ SPIRVInstruction::SPIRVInstruction(unsigned TheWordCount, Op TheOC,
                                    SPIRVType *TheType, SPIRVId TheId,
                                    SPIRVBasicBlock *TheBB)
     : SPIRVValue(TheBB->getModule(), TheWordCount, TheOC, TheType, TheId),
-      BB(TheBB) {
+      BB(TheBB),
+      DebugScope(nullptr) {
   validate();
 }
 
 SPIRVInstruction::SPIRVInstruction(unsigned TheWordCount, Op TheOC,
                                    SPIRVType *TheType, SPIRVId TheId,
                                    SPIRVBasicBlock *TheBB, SPIRVModule *TheBM)
-    : SPIRVValue(TheBM, TheWordCount, TheOC, TheType, TheId), BB(TheBB) {
+    : SPIRVValue(TheBM, TheWordCount, TheOC, TheType, TheId),
+      BB(TheBB),
+      DebugScope(nullptr) {
   validate();
 }
 
 // Complete constructor for instruction with id but no type
 SPIRVInstruction::SPIRVInstruction(unsigned TheWordCount, Op TheOC,
                                    SPIRVId TheId, SPIRVBasicBlock *TheBB)
-    : SPIRVValue(TheBB->getModule(), TheWordCount, TheOC, TheId), BB(TheBB) {
+    : SPIRVValue(TheBB->getModule(), TheWordCount, TheOC, TheId),
+      BB(TheBB),
+      DebugScope(nullptr) {
   validate();
 }
 // Complete constructor for instruction without type and id
 SPIRVInstruction::SPIRVInstruction(unsigned TheWordCount, Op TheOC,
                                    SPIRVBasicBlock *TheBB)
-    : SPIRVValue(TheBB->getModule(), TheWordCount, TheOC), BB(TheBB) {
+    : SPIRVValue(TheBB->getModule(), TheWordCount, TheOC),
+      BB(TheBB),
+      DebugScope(nullptr) {
   validate();
 }
 // Complete constructor for instruction with type but no id
 SPIRVInstruction::SPIRVInstruction(unsigned TheWordCount, Op TheOC,
                                    SPIRVType *TheType, SPIRVBasicBlock *TheBB)
-    : SPIRVValue(TheBB->getModule(), TheWordCount, TheOC, TheType), BB(TheBB) {
+    : SPIRVValue(TheBB->getModule(), TheWordCount, TheOC, TheType),
+      BB(TheBB),
+      DebugScope(nullptr) {
   validate();
 }
 

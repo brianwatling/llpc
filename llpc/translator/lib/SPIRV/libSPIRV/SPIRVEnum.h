@@ -82,6 +82,7 @@ enum SPIRVExtInstSetKind {
   SPIRVEIS_GcnShaderAMD,
   SPIRVEIS_ShaderTrinaryMinMaxAMD,
   SPIRVEIS_NonSemanticInfo,
+  SPIRVEIS_Debug,
   SPIRVEIS_Count,
 };
 
