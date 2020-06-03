@@ -58,9 +58,26 @@ SPIRVToLLVMDbgTran::SPIRVToLLVMDbgTran(SPIRVModule *TBM, Module *TM,
   Enable = BM->hasDebugInfo();
 }
 
+void SPIRVToLLVMDbgTran::createCompilationUnit() {
+  if (!Enable)
+    return;
+  std::string FileName;
+  SPIRVFunction* EntryPoint = BM->getEntryPoint(BM->getExecutionModel(), 0U);
+  if (EntryPoint && EntryPoint->hasLine()) {
+    FileName = EntryPoint->getLine()->getFileNameStr();
+  } else {
+    FileName = "spirv.dbg.cu"; // File name must be non-empty
+  }
+  Builder.createCompileUnit(dwarf::DW_LANG_C99,
+                            getDIFile(FileName),
+                            "spirv", false, "", 0, "",
+                            DICompileUnit::LineTablesOnly);
+}
+
 void SPIRVToLLVMDbgTran::addDbgInfoVersion() {
   if (!Enable)
     return;
+  M->addModuleFlag(Module::Warning, "Dwarf Version", dwarf::DWARF_VERSION);
   M->addModuleFlag(Module::Warning, "Debug Info Version",
                    DEBUG_METADATA_VERSION);
 }
@@ -68,9 +85,7 @@ void SPIRVToLLVMDbgTran::addDbgInfoVersion() {
 DIFile *SPIRVToLLVMDbgTran::getDIFile(const string &FileName) {
   return getOrInsert(FileMap, FileName, [=]() {
     SplitFileName Split(FileName);
-    if (!Split.BaseName.empty())
-      return Builder.createFile(Split.BaseName, Split.Path);
-    return static_cast<DIFile *>(nullptr);
+    return Builder.createFile(Split.BaseName, Split.Path);
   });
 }
 
@@ -91,13 +106,15 @@ const std::string &SPIRVToLLVMDbgTran::getString(const SPIRVId Id) {
 }
 
 void SPIRVToLLVMDbgTran::transDbgInfo(const SPIRVValue *SV, Value *V) {
+  if (!Enable || !SV->hasLine())
+    return;
   // A constant sampler does not have a corresponding SPIRVInstruction.
   if (SV->getOpCode() == OpConstantSampler)
     return;
 
   if (Instruction *I = dyn_cast<Instruction>(V)) {
     const SPIRVInstruction *SI = static_cast<const SPIRVInstruction *>(SV);
-    I->setDebugLoc(transDebugScope(SI));
+    I->setDebugLoc(transDebugScope(SI, I));
   }
 }
 
@@ -500,8 +517,8 @@ DINode *SPIRVToLLVMDbgTran::transFunction(const SPIRVExtInst *DebugInst) {
   return DIS;
 }
 
-DISubprogram *SPIRVToLLVMDbgTran::getDISubprogram(SPIRVFunction *f) {
-  auto DIS = FuncMap.find(f->getId());
+DISubprogram *SPIRVToLLVMDbgTran::getDISubprogram(const SPIRVFunction *SF) {
+  auto DIS = FuncMap.find(SF->getId());
   if (DIS == FuncMap.end()) {
     return nullptr;
   }
@@ -935,24 +952,50 @@ SPIRVToLLVMDbgTran::transDebugIntrinsic(const SPIRVExtInst *DebugInst,
   }
 }
 
-DebugLoc SPIRVToLLVMDbgTran::transDebugScope(const SPIRVInstruction *Inst) {
+DebugLoc SPIRVToLLVMDbgTran::transDebugScope(const SPIRVInstruction *SpirvInst, const Instruction* Inst) {
   unsigned Line = 0;
   unsigned Col = 0;
   MDNode *Scope = nullptr;
   MDNode *InlinedAt = nullptr;
-  if (auto L = Inst->getLine()) {
+  if (auto L = SpirvInst->getLine()) {
     Line = L->getLine();
     Col = L->getColumn();
   }
-  if (SPIRVEntry *S = Inst->getDebugScope()) {
+  if (SPIRVEntry *S = SpirvInst->getDebugScope()) {
     using namespace SPIRVDebug::Operand::Scope;
     SPIRVExtInst *DbgScope = static_cast<SPIRVExtInst *>(S);
     SPIRVWordVec Ops = DbgScope->getArguments();
     Scope = getScope(BM->getEntry(Ops[ScopeIdx]));
     if (Ops.size() > InlinedAtIdx)
       InlinedAt = transDebugInst(BM->get<SPIRVExtInst>(Ops[InlinedAtIdx]));
+    return DebugLoc::get(Line, Col, Scope, InlinedAt);
   }
-  return DebugLoc::get(Line, Col, Scope, InlinedAt);
+
+  auto* SF = SpirvInst->getParent()->getParent();
+  DISubprogram* Sub = getDISubprogram(SF);
+  if (!Sub) {
+    // There's no debug scope present, so we'll assume the scope is a basic
+    // function. Note that a debug scope will be availbale if full SPIR-V debug
+    // info is present.
+    std::string Filename;
+    unsigned LN = 0;
+    if (SF->hasLine()) {
+      Filename= SF->getLine()->getFileNameStr();
+      LN = SF->getLine()->getLine();
+    }
+    auto DF = getDIFile(Filename);
+    auto* F = Inst->getParent()->getParent();
+    auto FN = F->getName();
+    auto SPFlags = DISubprogram::SPFlagDefinition;
+    if (llvm::Function::isInternalLinkage(F->getLinkage())) {
+      SPFlags |= DISubprogram::SPFlagLocalToUnit;
+    }
+    auto* Ty = Builder.createSubroutineType(Builder.getOrCreateTypeArray(None));
+    Sub = Builder.createFunction(DF, FN, FN, DF, LN, Ty, LN, DINode::FlagZero,
+                                 SPFlags);
+    FuncMap[SF->getId()] = Sub;
+  }
+  return DebugLoc::get(Line, Col, Sub);
 }
 
 MDNode *SPIRVToLLVMDbgTran::transDebugInlined(const SPIRVExtInst *Inst) {

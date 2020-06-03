@@ -65,6 +65,7 @@ class SPIRVToLLVMDbgTran {
   typedef std::vector<SPIRVWord> SPIRVWordVec;
 
   SPIRVToLLVMDbgTran(SPIRVModule *TBM, Module *TM, SPIRVToLLVM *Reader);
+  void createCompilationUnit();
   void addDbgInfoVersion();
   void transDbgInfo(const SPIRVValue *SV, Value *V);
   template <typename T = MDNode>
@@ -79,7 +80,7 @@ class SPIRVToLLVMDbgTran {
   }
   Instruction *transDebugIntrinsic(const SPIRVExtInst *DebugInst,
                                    BasicBlock *BB);
-  DISubprogram *getDISubprogram(SPIRVFunction *f);
+  DISubprogram *getDISubprogram(const SPIRVFunction *SF);
   void finalize();
 
  private:
@@ -92,7 +93,7 @@ class SPIRVToLLVMDbgTran {
 
   llvm::DebugLoc transDebugLocation(const SPIRVExtInst *DebugInst);
 
-  llvm::DebugLoc transDebugScope(const SPIRVInstruction *Inst);
+  llvm::DebugLoc transDebugScope(const SPIRVInstruction *SpirvInst, const Instruction* Inst);
 
   MDNode *transDebugInlined(const SPIRVExtInst *Inst);
 

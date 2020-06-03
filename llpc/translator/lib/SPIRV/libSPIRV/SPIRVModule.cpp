@@ -78,7 +78,7 @@ public:
   SPIRVEntry *getEntry(SPIRVId Id) const override;
   // If we have at least on OpLine in the module the CurrentLine is non-empty
   bool hasDebugInfo() const override {
-    return CurrentLine.get() || !DebugInstVec.empty();
+    return CurrentLine.get() || !StringVec.empty() || !DebugInstVec.empty();
   }
 
   // Error handling functions
@@ -524,6 +524,17 @@ void SPIRVModuleImpl::layoutEntry(SPIRVEntry *E) {
     if (!BV->getParent())
       addTo(VariableVec, E);
   } break;
+  case OpExtInst: {
+    SPIRVExtInst *EI = static_cast<SPIRVExtInst *>(E);
+    if (EI->getExtSetKind() == SPIRVEIS_Debug &&
+        EI->getExtOp() != SPIRVDebug::Declare &&
+        EI->getExtOp() != SPIRVDebug::Value &&
+        EI->getExtOp() != SPIRVDebug::Scope &&
+        EI->getExtOp() != SPIRVDebug::NoScope) {
+      DebugInstVec.push_back(EI);
+    }
+    break;
+  }
   default:
     if (isTypeOpCode(OC))
       TypeVec.push_back(static_cast<SPIRVType *>(E));
@@ -1348,27 +1359,6 @@ SPIRVModuleImpl::addInstTemplate(Op OC, const std::vector<SPIRVWord> &Ops,
   auto Ins = SPIRVInstTemplateBase::create(OC, Ty, Id, Ops, BB, this);
   BB->addInstruction(Ins);
   return Ins;
-}
-
-SPIRVDbgInfo::SPIRVDbgInfo(SPIRVModule *TM) : M(TM) {}
-
-std::string SPIRVDbgInfo::getEntryPointFileStr(SPIRVExecutionModelKind EM,
-                                               unsigned I) {
-  if (M->getNumEntryPoints(EM) == 0)
-    return "";
-  return getFunctionFileStr(M->getEntryPoint(EM, I));
-}
-
-std::string SPIRVDbgInfo::getFunctionFileStr(SPIRVFunction *F) {
-  if (F->hasLine())
-    return F->getLine()->getFileNameStr();
-  return "";
-}
-
-unsigned SPIRVDbgInfo::getFunctionLineNo(SPIRVFunction *F) {
-  if (F->hasLine())
-    return F->getLine()->getLine();
-  return 0;
 }
 
 bool isSpirvBinary(const std::string &Img) {

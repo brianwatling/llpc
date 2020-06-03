@@ -5917,14 +5917,18 @@ bool SPIRVToLLVM::translate(ExecutionModel entryExecModel, const char *entryName
       m_bm->hasCapability(CapabilityImageGatherBiasLodAMD) && entryExecModel == ExecutionModelFragment;
 
   // Compile unit might be needed during translation of debug intrinsics.
+  MDNode* compilationUnit = nullptr;
   for (SPIRVExtInst *EI : m_bm->getDebugInstVec()) {
     // Translate Compile Unit first.
     // It shuldn't be far from the beginig of the vector
     if (EI->getExtOp() == SPIRVDebug::CompilationUnit) {
-      m_dbgTran.transDebugInst(EI);
+      compilationUnit = m_dbgTran.transDebugInst(EI);
       // Fixme: there might be more then one Compile Unit.
       break;
     }
+  }
+  if (!compilationUnit) {
+    m_dbgTran.createCompilationUnit();
   }
   // Then translate all debug instructions.
   for (SPIRVExtInst *EI : m_bm->getDebugInstVec()) {

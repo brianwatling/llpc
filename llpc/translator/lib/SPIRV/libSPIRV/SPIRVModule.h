@@ -351,18 +351,6 @@ protected:
   bool ValidateCapability;
 };
 
-class SPIRVDbgInfo {
-public:
-  SPIRVDbgInfo(SPIRVModule *TM);
-  std::string getEntryPointFileStr(SPIRVExecutionModelKind, unsigned);
-  std::string getFunctionFileStr(SPIRVFunction *);
-  unsigned getFunctionLineNo(SPIRVFunction *);
-
-private:
-  std::unordered_map<SPIRVFunction *, SPIRVLine *> FuncMap;
-  const std::string ModuleFileStr;
-  SPIRVModule *M;
-};
 } // namespace SPIRV
 
 #endif // SPIRV_LIBSPIRV_SPIRVMODULE_H
