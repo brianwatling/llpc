@@ -1,13 +1,13 @@
 ; BEGIN_SHADERTEST
 ; RUN: amdllpc -trim-debug-info=false -spvgen-dir=%spvgendir% -v %gfxip %s | FileCheck -check-prefix=SHADERTEST %s
 ; SHADERTEST-LABEL: {{^// LLPC}} SPIRV-to-LLVM translation results
-; SHADERTEST: {{![0-9]*}} = !{i32 {{[0-9]*}}, !"Dwarf Version", i32 4}
-; SHADERTEST: {{![0-9]*}} = !{i32 {{[0-9]*}}, !"Debug Info Version", i32 3}
+; SHADERTEST: {{![0-9]*}} = !{i32 7, !"Dwarf Version", i32 4}
+; SHADERTEST: {{![0-9]*}} = !{i32 2, !"Debug Info Version", i32 3}
 ; SHADERTEST: {{![0-9]*}} = distinct !DICompileUnit(language: DW_LANG_Cobol74, file: [[D1:![0-9]*]], producer: "spirv", isOptimized: false, runtimeVersion: 0, emissionKind: FullDebug, enums: [[D2:![0-9]*]])
 ; SHADERTEST: [[D1]] = !DIFile(filename: "simple.hlsl", directory: ".")
 ; SHADERTEST: [[D2]] = !{}
-; TODO: Implement and check for DIExpression
 ; SHADERTEST-LABEL: {{^// LLPC}} SPIR-V lowering results
+; TODO: check for type information
 ; SHADERTEST: AMDLLPC SUCCESS
 ; END_SHADERTEST
 
@@ -23,7 +23,10 @@ OpMemoryModel Logical GLSL450
 OpEntryPoint Vertex %main "main" %f32_output %f32vec2_output %u32_output %u32vec2_output %u64_output %f32_input %f32vec2_input %u32_input %u32vec2_input %u64_input
 
 %src = OpString "simple.hlsl"
-%code = OpString "void main() { }"
+%code = OpString "main() {}"
+%main_name = OpString "main"
+%main_linkage_name = OpString "v_main"
+%float_name = OpString "float"
 
 %void = OpTypeVoid
 %func = OpTypeFunction %void
@@ -101,6 +104,8 @@ OpEntryPoint Vertex %main "main" %f32_output %f32vec2_output %u32_output %u32vec
 %s64_2 = OpConstant %s64 2
 %s64_3 = OpConstant %s64 3
 
+%int_32 = OpConstant %u32 32
+
 %s32vec2_01 = OpConstantComposite %s32vec2 %s32_0 %s32_1
 %u32vec2_01 = OpConstantComposite %u32vec2 %u32_0 %u32_1
 
@@ -165,9 +170,11 @@ OpEntryPoint Vertex %main "main" %f32_output %f32vec2_output %u32_output %u32vec
 
 %dbg_src = OpExtInst %void %DbgExt DebugSource %src %code
 %comp_unit = OpExtInst %void %DbgExt DebugCompilationUnit 2 4 %dbg_src HLSL
-%op0 = OpExtInst %void %DbgExt DebugOperation Deref
-%op1 = OpExtInst %void %DbgExt DebugOperation Plus
-%null_expr = OpExtInst %void %DbgExt DebugExpression %op0 %op1
+%float_info = OpExtInst %void %DbgExt DebugTypeBasic %float_name %int_32 Float
+%main_type_info1 = OpExtInst %void %DbgExt DebugTypeFunction FlagIsPublic %void
+%main_type_info2 = OpExtInst %void %DbgExt DebugTypeFunction FlagIsPublic %float_info
+%main_type_info3 = OpExtInst %void %DbgExt DebugTypeFunction FlagIsPublic %float_info %float_info
+%main_type_info4 = OpExtInst %void %DbgExt DebugTypeFunction FlagIsPublic %void %float_info %float_info
 
 %main = OpFunction %void None %func
 %main_entry = OpLabel

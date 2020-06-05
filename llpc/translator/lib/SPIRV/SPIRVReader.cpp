@@ -5924,7 +5924,7 @@ bool SPIRVToLLVM::translate(ExecutionModel entryExecModel, const char *entryName
   MDNode* compilationUnit = nullptr;
   for (SPIRVExtInst *EI : m_bm->getDebugInstVec()) {
     // Translate Compile Unit first.
-    // It shuldn't be far from the beginig of the vector
+    // It shouldn't be far from the beginning of the vector
     if (EI->getExtOp() == SPIRVDebug::CompilationUnit) {
       compilationUnit = m_dbgTran.transDebugInst(EI);
       // Fixme: there might be more then one Compile Unit.
