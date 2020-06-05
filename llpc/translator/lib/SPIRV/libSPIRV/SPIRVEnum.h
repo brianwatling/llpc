@@ -116,6 +116,7 @@ template <> inline void SPIRVMap<SPIRVExtInstSetKind, std::string>::init() {
   add(SPIRVEIS_GcnShaderAMD, "SPV_AMD_gcn_shader");
   add(SPIRVEIS_ShaderTrinaryMinMaxAMD, "SPV_AMD_shader_trinary_minmax");
   add(SPIRVEIS_NonSemanticInfo, "SPV_KHR_non_semantic_info");
+  add(SPIRVEIS_Debug , "OpenCL.DebugInfo.100");
 }
 typedef SPIRVMap<SPIRVExtInstSetKind, std::string> SPIRVBuiltinSetNameMap;
 

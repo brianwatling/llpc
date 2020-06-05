@@ -25,16 +25,16 @@ void main()
 ; SHADERTEST: load {{.*}} !dbg [[D5:![0-9]*]]
 ; SHADERTEST: store {{.*}} !dbg [[D5]]
 ; SHADERTEST: ret void, !dbg [[D5]]
-; SHADERTEST: !llvm.dbg.cu = !{[[D6:![0-9]*]]}
 ; SHADERTEST: !llvm.module.flags = !{[[D7:![0-9]*]], [[D8:![0-9]*]]}
+; SHADERTEST: !llvm.dbg.cu = !{[[D6:![0-9]*]]}
 ; SHADERTEST: [[D0]] = !{{.*}} i64, i64 } { i64 {{[0-9]*}}, i64 0
 ; SHADERTEST: [[D1]] = !{{.*}} i64, i64 } { i64 {{[0-9]*}}, i64 0
 ; SHADERTEST: [[D2]] = !{{.*}} i64, i64 } { i64 {{[0-9]*}}, i64 0
+; SHADERTEST: [[D7:![0-9]*]] = !{i32 2, !"Dwarf Version", i32 4}
+; SHADERTEST: [[D8:![0-9]*]] = !{i32 2, !"Debug Info Version", i32 3}
 ; SHADERTEST: [[D9:![0-9]*]] = distinct !DICompileUnit(language: DW_LANG_C99, file: [[D10:![0-9]*]], producer: "spirv", isOptimized: false, runtimeVersion: 0, emissionKind: LineTablesOnly, enums: [[D11:![0-9]*]])
 ; SHADERTEST: [[D10]] = !DIFile(filename: "spirv.dbg.cu", directory: ".")
 ; SHADERTEST: [[D11]] = !{}
-; SHADERTEST: [[D7:![0-9]*]] = !{i32 2, !"Dwarf Version", i32 4}
-; SHADERTEST: [[D8:![0-9]*]] = !{i32 2, !"Debug Info Version", i32 3}
 ; SHADERTEST: [[D3]] = !{i32 4}
 ; SHADERTEST: [[D4]] = !DILocation(line: 11, scope: [[D12:![0-9]*]])
 ; SHADERTEST: [[D12]] = distinct !DISubprogram(name: "main", linkageName: "main", scope: [[D13:![0-9]*]], file: [[D13]], type: [[D14:![0-9]*]], spFlags: DISPFlagDefinition, unit: [[D9]], retainedNodes: [[D11]])

@@ -66,7 +66,6 @@ class SPIRVToLLVMDbgTran {
 
   SPIRVToLLVMDbgTran(SPIRVModule *TBM, Module *TM, SPIRVToLLVM *Reader);
   void createCompilationUnit();
-  void addDbgInfoVersion();
   void transDbgInfo(const SPIRVValue *SV, Value *V);
   template <typename T = MDNode>
   T *transDebugInst(const SPIRVExtInst *DebugInst) {

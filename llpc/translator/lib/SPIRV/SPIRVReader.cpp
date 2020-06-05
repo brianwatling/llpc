@@ -3438,6 +3438,10 @@ template <> Value *SPIRVToLLVM::transValueWithOpcode<OpExtInst>(SPIRVValue *cons
   case SPIRVEIS_ShaderTrinaryMinMaxAMD:
     return transTrinaryMinMaxExtInst(spvExtInst, block);
 
+  case SPIRVEIS_Debug:
+    //m_dbgTran.transDebugInst(spvExtInst);
+    return m_dbgTran.transDebugIntrinsic(spvExtInst, block);
+
   default:
     llvm_unreachable("Should never be called!");
     return nullptr;
@@ -5934,7 +5938,6 @@ bool SPIRVToLLVM::translate(ExecutionModel entryExecModel, const char *entryName
   for (SPIRVExtInst *EI : m_bm->getDebugInstVec()) {
     m_dbgTran.transDebugInst(EI);
   }
-  m_dbgTran.addDbgInfoVersion();
 
   for (unsigned i = 0, e = m_bm->getNumConstants(); i != e; ++i) {
     auto bv = m_bm->getConstant(i);

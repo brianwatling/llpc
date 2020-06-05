@@ -68,18 +68,13 @@ void SPIRVToLLVMDbgTran::createCompilationUnit() {
   } else {
     FileName = "spirv.dbg.cu"; // File name must be non-empty
   }
+  M->addModuleFlag(Module::Warning, "Dwarf Version", dwarf::DWARF_VERSION);
+  M->addModuleFlag(Module::Warning, "Debug Info Version",
+                   DEBUG_METADATA_VERSION);
   Builder.createCompileUnit(dwarf::DW_LANG_C99,
                             getDIFile(FileName),
                             "spirv", false, "", 0, "",
                             DICompileUnit::LineTablesOnly);
-}
-
-void SPIRVToLLVMDbgTran::addDbgInfoVersion() {
-  if (!Enable)
-    return;
-  M->addModuleFlag(Module::Warning, "Dwarf Version", dwarf::DWARF_VERSION);
-  M->addModuleFlag(Module::Warning, "Debug Info Version",
-                   DEBUG_METADATA_VERSION);
 }
 
 DIFile *SPIRVToLLVMDbgTran::getDIFile(const string &FileName) {
@@ -131,6 +126,8 @@ SPIRVToLLVMDbgTran::transCompileUnit(const SPIRVExtInst *DebugInst) {
   using namespace SPIRVDebug::Operand::CompilationUnit;
   assert(Ops.size() == OperandCount && "Invalid number of operands");
   M->addModuleFlag(llvm::Module::Max, "Dwarf Version", Ops[DWARFVersionIdx]);
+  M->addModuleFlag(Module::Warning, "Debug Info Version",
+                   DEBUG_METADATA_VERSION);
   SPIRVExtInst *Source = BM->get<SPIRVExtInst>(Ops[SourceIdx]);
   SPIRVId FileId = Source->getArguments()[SPIRVDebug::Operand::Source::FileIdx];
   std::string File = getString(FileId);
@@ -467,11 +464,12 @@ DINode *SPIRVToLLVMDbgTran::transFunction(const SPIRVExtInst *DebugInst) {
   if (SPIRVDebugFlags & SPIRVDebug::FlagIsPrivate)
     Flags |= llvm::DINode::FlagPrivate;
 
-  bool IsDefinition = SPIRVDebugFlags & SPIRVDebug::FlagIsDefinition;
+  // TODO: IsDefinition is always true for DebugFunction, but should be false
+  // for DebugFunctionDeclaration.
+  const bool IsDefinition = true;
   bool IsOptimized = SPIRVDebugFlags & SPIRVDebug::FlagIsOptimized;
   bool IsLocal = SPIRVDebugFlags & SPIRVDebug::FlagIsLocal;
-  bool IsMainSubprogram =
-      BM->isEntryPoint(spv::ExecutionModelKernel, Ops[FunctionIdIdx]);
+  bool IsMainSubprogram = BM->getEntryPoint(Ops[FunctionIdIdx]) != nullptr;
   DISubprogram::DISPFlags SPFlags =
       DISubprogram::toSPFlags(IsLocal, IsDefinition, IsOptimized,
                               DISubprogram::SPFlagNonvirtual, IsMainSubprogram);
@@ -892,6 +890,10 @@ MDNode *SPIRVToLLVMDbgTran::transDebugInstImpl(const SPIRVExtInst *DebugInst) {
 
   case SPIRVDebug::Expression:
     return transExpression(DebugInst);
+
+  case SPIRVDebug::Declare:
+    // TODO: implement
+    return nullptr;
 
   default:
     llvm_unreachable("Not implemented SPIR-V debug instruction!");
